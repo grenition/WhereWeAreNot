@@ -37,10 +37,6 @@ public class CameraLooking : MonoBehaviour
 
 
     [Header("Optional")]
-    [SerializeField] private Transform body;
-    /// <summary>
-    /// This objects destroys if is not local player
-    /// </summary>
     [SerializeField] private Camera viewCamera;
 
     [Header("Apply if want to control head")]
@@ -53,15 +49,6 @@ public class CameraLooking : MonoBehaviour
         {
             if (Instance != null)
                 return Instance.viewCamera;
-            return null;
-        }
-    }
-    public static Transform Body
-    {
-        get
-        {
-            if (Instance != null && Instance.body != null)
-                return Instance.body;
             return null;
         }
     }
@@ -95,7 +82,6 @@ public class CameraLooking : MonoBehaviour
     public Vector3 Rotation { get; set; }
     public Vector2 MouseDelta { get => mouseDelta; }
 
-    private Vector2 savedMousePosition = Vector2.zero;
     private Vector2 mouseDelta = Vector2.zero;
     private bool cursorIsVisible = false;
     private Transform tr;
@@ -114,11 +100,7 @@ public class CameraLooking : MonoBehaviour
     private void OnEnable()
     {
         Rotation = transform.localEulerAngles;
-        if (body != null)
-            Rotation = new Vector3(Rotation.x, body.localEulerAngles.y, Rotation.z);
-
         ShowCursor = false;
-        savedMousePosition = Input.mousePosition;
     }
     private void OnDisable()
     {
@@ -134,22 +116,15 @@ public class CameraLooking : MonoBehaviour
         if (LockRotation)
             return;
 
-        mouseDelta = (Vector2)(Input.mousePosition) - savedMousePosition;
-        mouseDelta *= sensivity * 0.1f;
-        savedMousePosition = Input.mousePosition;
+        mouseDelta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
+        mouseDelta *= sensivity;
 
         Rotation += new Vector3(-mouseDelta.y, mouseDelta.x, 0f);
 
         Rotation = LoopEulers(Rotation);
         Rotation = ClampEulers(Rotation);
 
-        if (body == null)
-            tr.localEulerAngles = Rotation;
-        else
-        {
-            tr.localEulerAngles = new Vector3(Rotation.x, tr.localEulerAngles.y, Rotation.z);
-            body.localEulerAngles = new Vector3(body.localEulerAngles.x, Rotation.y, body.localEulerAngles.z);
-        }
+        tr.localEulerAngles = Rotation;
     }
     private Vector3 ClampEulers(Vector3 eulers)
     {

@@ -34,7 +34,7 @@ public class Walker : MonoBehaviour
     //parameters
     [Header("Main")]
     [SerializeField] private float height = 2f;
-    [SerializeField] private float radius = 0.5f;
+    [SerializeField] private float radius = 0.4f;
     [SerializeField] private float maxObstacleHeight = 0.4f;
     [Range(0f, 90f)] public float slopeLimit = 60f;
 
@@ -44,14 +44,14 @@ public class Walker : MonoBehaviour
 
     [Header("Optional")]
     [SerializeField] private float dampingAirMomentumMultiplier = 2f;
-    [SerializeField] private float dampingSlidingAfterFallMomentumMultiplier = 20f;
-    [SerializeField] private float dampingAngleSlidingMomentumMultiplier = 20f;
+    [SerializeField] private float dampingSlidingAfterFallMomentumMultiplier = 17f;
+    [SerializeField] private float dampingAngleSlidingMomentumMultiplier = 50f;
     [SerializeField] private float dampingMovementMomentumWhenSlidingMultiplier = 5f;
-    [SerializeField] private float dampingSavedMomentumInExtraModeMultiplier = 10f;
+    [SerializeField] private float dampingSavedMomentumInExtraModeMultiplier = 18f;
     [SerializeField] private float groundAdjustmentSpeed = 20f;
     [SerializeField] private float adjustmingDelayWhenJump = 0.3f;
-    [SerializeField] private float groundDeterminationOffset = 0.05f;
-    [SerializeField] private LayerMask detectingGroundAndRoofLayerMask;
+    [SerializeField] private float groundDeterminationOffset = 0.04f;
+    [SerializeField] private LayerMask detectingGroundAndRoofLayerMask = 1 << 0; 
     #endregion
 
     #region Public values
