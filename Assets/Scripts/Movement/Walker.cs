@@ -104,6 +104,7 @@ public class Walker : MonoBehaviour
     private float availableForFollowGroundNormalTime = 0f;
     private Vector3 targetRotationNormal = Vector3.up;
     private Vector3 savedNormal = Vector3.up;
+    private float ignoreFlippingTime = 0f;
     #endregion
 
     #region Base functions
@@ -208,7 +209,10 @@ public class Walker : MonoBehaviour
         }
         else if (state != WalkerState.extra)
         {
-            physicsMomentum += -tr.up * Physics.gravity.magnitude * Time.fixedDeltaTime;
+            Vector3 _dir = -tr.up;
+            if (Time.time < ignoreFlippingTime)
+                _dir = -targetRotationNormal;
+            physicsMomentum += _dir * Physics.gravity.magnitude * Time.fixedDeltaTime;
         }
     }
     private WalkerState GetCurrentState()
@@ -369,8 +373,11 @@ public class Walker : MonoBehaviour
             Vector3 direction = -tr.up;
             if (state == WalkerState.onGround && Physics.Raycast(startPoint, direction, out RaycastHit _flatHit, height / 2 + maxObstacleHeight, detectingGroundAndRoofLayerMask))
             {
-                if (_flatHit.collider.tag == "RotationGround")
-                    savedNormal = _flatHit.normal;
+                if (_flatHit.collider.TryGetComponent(out Surface surf))
+                {
+                    if(surf.RotationGroundSurface)
+                        savedNormal = _flatHit.normal;
+                }
                 Quaternion _rot = Quaternion.FromToRotation(tr.up, savedNormal);
                 rb.MoveRotation(Quaternion.Lerp(tr.rotation, _rot * tr.rotation, Time.deltaTime * lerpingRotationMultiplier));
             }
@@ -435,6 +442,10 @@ public class Walker : MonoBehaviour
     public void DontFollowGroundNormal()
     {
         availableForFollowGroundNormalTime = 0f;
+    }
+    public void GravityFollowTargetRotationNormalForTime(float time)
+    {
+        ignoreFlippingTime = Time.time + time;
     }
     #endregion
 

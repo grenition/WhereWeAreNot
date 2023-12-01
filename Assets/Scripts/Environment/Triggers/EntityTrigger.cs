@@ -5,13 +5,18 @@ using UnityEngine.Events;
 
 public class EntityTrigger : MonoBehaviour
 {
+    public bool TriggerEnabled { get => triggerEnabled; set { triggerEnabled = value; } }
+
     public UnityAction OnPlayerTriggerEnter;
     public UnityAction OnPlayerTriggerExit;
     public List<Entity> EntitiesInTrigger { get => entities; }
     private List<Entity> entities = new List<Entity>();
 
+    [SerializeField] private bool triggerEnabled = true;
     private void OnTriggerEnter(Collider other)
     {
+        if (!triggerEnabled)
+            return;
         if (other.gameObject.TryGetComponent(out Entity _entity))
         {
             entities.Add(_entity);
@@ -25,6 +30,8 @@ public class EntityTrigger : MonoBehaviour
     }
     private void OnTriggerStay(Collider other)
     {
+        if (!triggerEnabled)
+            return;
         foreach (var _entity in entities)
         {
             OnEntityStay(_entity);
@@ -37,6 +44,8 @@ public class EntityTrigger : MonoBehaviour
     }
     private void OnTriggerExit(Collider other)
     {
+        if (!triggerEnabled)
+            return;
         if (other.gameObject.TryGetComponent(out Entity _entity))
         {
             entities.Remove(_entity);

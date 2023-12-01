@@ -14,7 +14,7 @@ public class Bullet : MonoBehaviour
         rb = GetComponent<Rigidbody>();
     }
 
-    public void SetShot(Vector3 velocity)
+    public void AddForce(Vector3 velocity)
     {
         rb.velocity = velocity;
     }
@@ -25,7 +25,7 @@ public class Bullet : MonoBehaviour
             GameObject obj = Instantiate(spawningAfterCollision, transform.position, Quaternion.identity);
             if (setNormalToNewObject)
             {
-                //obj.transform.LookAt()
+                obj.transform.LookAt(collision.contacts[0].normal, Vector3.up);
             }
         }
 
