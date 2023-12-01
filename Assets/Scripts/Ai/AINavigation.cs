@@ -46,12 +46,19 @@ public class AINavigation : MonoBehaviour
             float randomZ = Random.Range(-walkPointRange, walkPointRange);
 
             // surface ground(fixed y) walking 
-            if (transform.position.y < 5f)
+            if (transform.position.y < 5f) {
+                navMeshAgent.enabled = false;
                 walkPoint = new Vector3(transform.position.x + randomX, transform.position.y, transform.position.z + randomZ);
+                navMeshAgent.enabled = true;
+            }
 
             // surface wall(fixed z) walking 
-            else
+            else {
+                navMeshAgent.enabled = false;
                 walkPoint = new Vector3(transform.position.x + randomX, transform.position.y + randomY, transform.position.z);
+                navMeshAgent.enabled = true;
+            }
+            
 
             walkPointSet = true;
         }
