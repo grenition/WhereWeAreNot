@@ -46,7 +46,7 @@ public class EnemyAI : MonoBehaviour
     [Tooltip("Скорость полёта снаряда")]
     [SerializeField] float projectileVelocity = 15f;
 
-    
+
 
 
     private NavMeshAgent navMeshAgent;
@@ -77,15 +77,20 @@ public class EnemyAI : MonoBehaviour
     {
         float distanceToPlayer = Vector3.Distance(Player.Instance.transform.position, transform.position);
 
-        if(distanceToPlayer < distanceToStartAttack) {
-            UpdateState(StateTypes.Attack);
+        if (Physics.Raycast(new Ray(transform.position, Player.Instance.transform.position - transform.position), out RaycastHit _hit, distanceToStartChase))
+        {
+            if (_hit.collider.gameObject == Player.Instance.gameObject)
+            {
+                if (distanceToPlayer < distanceToStartAttack)
+                    UpdateState(StateTypes.Attack);
+                else
+                    UpdateState(StateTypes.Chase);
+            }
+            else
+                UpdateState(StateTypes.Seek);
         }
-        else if(distanceToPlayer < distanceToStartChase) {
-            UpdateState(StateTypes.Chase);
-        }
-        else if(distanceToPlayer > seekRadius) {
-            UpdateState(StateTypes.Seek);
-        }
+        else UpdateState(StateTypes.Seek);
+
     }
 
     void UpdateState(StateTypes newState)
@@ -95,7 +100,6 @@ public class EnemyAI : MonoBehaviour
 
     void Seek()
     {
-
         if (!targetSet)
         {
             float randomX = Random.Range(initialPozition.x - seekRadius, initialPozition.x + seekRadius);
@@ -138,7 +142,7 @@ public class EnemyAI : MonoBehaviour
     void OnDrawGizmosSelected()
     {
         Gizmos.color = new Color(0, 255, 0);
-        Gizmos.DrawWireCube(initialPozition, new Vector3(seekRadius * 2f, 2,seekRadius * 2));
+        Gizmos.DrawWireCube(transform.position, new Vector3(seekRadius * 2f, 2, seekRadius * 2));
 
 
         Gizmos.color = new Color(0, 0, 255);

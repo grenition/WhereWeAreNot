@@ -166,9 +166,9 @@ Rigidbody:
   m_ImplicitTensor: 1
   m_UseGravity: 0
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 112
-  m_CollisionDetection: 2
+  m_CollisionDetection: 0
 --- !u!195 &5339220010718413927
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -214,4 +214,4 @@ MonoBehaviour:
   projectile: {fileID: 9010317917924161751, guid: f47292c79bed5764a8d5bbe7fad40a42,
     type: 3}
   shootingPoint: {fileID: 1174807367166839048}
-  projectileVelocity: 15
+  projectileVelocity: 40
