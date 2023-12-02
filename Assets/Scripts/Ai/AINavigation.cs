@@ -27,7 +27,6 @@ public class AINavigation : MonoBehaviour
     void Awake()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
-
     }
 
     // Update is called once per frame
@@ -47,9 +46,7 @@ public class AINavigation : MonoBehaviour
 
             // surface ground(fixed y) walking 
             if (transform.position.y < 5f) {
-                navMeshAgent.enabled = false;
                 walkPoint = new Vector3(transform.position.x + randomX, transform.position.y, transform.position.z + randomZ);
-                navMeshAgent.enabled = true;
             }
 
             // surface wall(fixed z) walking 
