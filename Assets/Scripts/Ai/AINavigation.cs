@@ -13,7 +13,7 @@ public class AINavigation : MonoBehaviour
     [Header("Navigation walkPoints")]
 
     [SerializeField] bool walkPointSet;
-    [SerializeField] private float walkPointRange;
+    [SerializeField] private float walkPointRange = 10f;
     [SerializeField] private Vector3 walkPoint;
 
     [Header("Navigation triggers")]
