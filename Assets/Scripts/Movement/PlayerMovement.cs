@@ -80,6 +80,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float detectingSpeedDelay = 0.3f;
     #endregion
     #region public values
+    public float SpeedTransitionMultiplier { get => speedTransitionMultiplier; set { speedTransitionMultiplier = value; } }
+    public float SpeedMultiplier { get => speedMultiplier; set { speedMultiplier = value; } }
     public bool isRunning { get; private set; }
     public bool isCrouching { get; private set; }
     public MovementEnvironment currentMovementEnvironment { get; private set; }
@@ -112,6 +114,8 @@ public class PlayerMovement : MonoBehaviour
     }
     #endregion
     #region Local values
+    private float speedTransitionMultiplier = 1f;
+    private float speedMultiplier = 1f;
     private bool lockMovement = false;
     private bool lockForwardRunning = false;
     private bool lockRunning = false;
@@ -201,7 +205,7 @@ public class PlayerMovement : MonoBehaviour
                 else
                     isJumpingOnLadder = false;
             }
-            walker.MoveInExtraMode(movementDirection + _jumpVelocity);
+            walker.MoveInExtraMode((movementDirection + _jumpVelocity) * speedMultiplier);
 
             //resetting values
             swimmingVelocity = Vector3.zero;
@@ -215,11 +219,11 @@ public class PlayerMovement : MonoBehaviour
             else
                 swimmingVelocity = movementDirection;
             //applying velocity 
-            walker.MoveInExtraMode(swimmingVelocity + drowningVelocity, true);
+            walker.MoveInExtraMode((swimmingVelocity + drowningVelocity) * speedMultiplier, true);
         }
         else
         {
-            walker.MoveOnPlane(movementDirection);
+            walker.MoveOnPlane(movementDirection * speedMultiplier);
             isJumpingOnLadder = false;
 
             //resetting values
@@ -292,7 +296,7 @@ public class PlayerMovement : MonoBehaviour
 
         //smoothing
         if (_inputDirection != inputDirection)
-            _inputDirection = Vector3.Lerp(inputDirection, _inputDirection, smoothingInputMultiplier * Time.fixedDeltaTime);
+            _inputDirection = Vector3.Lerp(inputDirection, _inputDirection, smoothingInputMultiplier * Time.fixedDeltaTime * speedTransitionMultiplier);
         inputDirection = _inputDirection;
 
         return _inputDirection;
@@ -404,7 +408,7 @@ public class PlayerMovement : MonoBehaviour
                 _targetSpeed = flyingSpeed;
                 break;
         }
-        _speed = Mathf.MoveTowards(_speed, _targetSpeed, smooothingSpeedTransitionsMultiplier * Time.fixedDeltaTime);
+        _speed = Mathf.MoveTowards(_speed, _targetSpeed, smooothingSpeedTransitionsMultiplier * Time.fixedDeltaTime * speedTransitionMultiplier);
         savedSpeed = _speed;
         return _speed;
     } 
