@@ -38,6 +38,14 @@ public class PhysicsPair
     {
         return point1 == null || point2 == null;
     }
+    public bool IsHaveSameConnections()
+    {
+        return point1.ConnectedBody == point2.ConnectedBody;
+    }
+    public bool IsHaveConnection()
+    {
+        return point1.IsConnected || point2.IsConnected;
+    }
     public void DestroyPair()
     {
         if (IsEmpty())
@@ -99,13 +107,12 @@ public class GravityWeapon : Weapon
             ChangeGravityMode();
         else if (Input.GetKeyDown(KeyCode.F))
             StartPairsAttraction();
+        UpdateLinesInPairs();
         if (workMode == GravityWeaponWorkMode.Points)
         {
             tempGravityTrigger.gameObject.SetActive(false);
             if(Input.GetKeyDown(KeyCode.Mouse0))
                 ShootPhysicsPoint();
-
-            UpdateLinesInPairs();
         }
         else
         {
@@ -175,16 +182,26 @@ public class GravityWeapon : Weapon
     }
     private void OnPhysicsPointPlaced(PhysicsPoint point)
     {
+        point.Initialize();
         physicsPoints.Add(point);
         if(physicsPoints.Count >= 2)
         {
+            PhysicsPair pair = new PhysicsPair(physicsPoints[0], physicsPoints[1]);
+
+            if (!pair.IsHaveConnection() || pair.IsHaveSameConnections())
+            {
+                physicsPoints.Clear();
+                pair.DestroyPair();
+                return; 
+            }
+            
+            CheckPairsList();
             if (physicsPairs.Count >= maxPairsCount)
             {
                 physicsPairs[0].DestroyPair();
                 physicsPairs.RemoveAt(0);
             }
 
-            PhysicsPair pair = new PhysicsPair(physicsPoints[0], physicsPoints[1]);
             pair.InitializeLineBetweenPoints(lineBetweenPointsPrefab);
             physicsPairs.Add(pair);
             physicsPoints.Clear();
@@ -199,6 +216,7 @@ public class GravityWeapon : Weapon
     }
     private void StartPairsAttraction()
     {
+        CheckPairsList();
         foreach (var pair in physicsPairs)
         {
             pair.StartPointsAttraction();
@@ -209,7 +227,9 @@ public class GravityWeapon : Weapon
         List<PhysicsPair> tempList = new List<PhysicsPair>();
         foreach(var pair in physicsPairs)
         {
-
+            if (!pair.IsEmpty())
+                tempList.Add(pair);
         }
+        physicsPairs = tempList;
     }
 }
