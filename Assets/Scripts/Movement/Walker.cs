@@ -431,6 +431,11 @@ public class Walker : MonoBehaviour
     {
         targetRotationNormal = _normal;
     }
+    public void SetRotation(Vector3 _normal)
+    {
+        targetRotationNormal = _normal;
+        tr.up = _normal;
+    }
     public void ResetTargetRotation()
     {
         targetRotationNormal = Vector3.up;

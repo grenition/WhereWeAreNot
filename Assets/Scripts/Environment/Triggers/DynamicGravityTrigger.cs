@@ -5,12 +5,25 @@ using UnityEngine;
 [RequireComponent(typeof(BoxCollider))]
 public class DynamicGravityTrigger : EntityTrigger
 {
-    public bool IsInCorner;
+    public bool IsPreview
+    {
+        get => isPreview;
+        set
+        {
+            isPreview = value;
+            TriggerEnabled = !value;
+        }
+    }
+    public Vector3 BoxScale { get => boxScale; }
+    public bool IsInCorner { get; private set; }
 
+    [Header("Important")]
+    [SerializeField] private bool destroyAfterEntityEntered = false;
+
+    [Header("Optional")]
     [SerializeField] private float checkingCornersDistance = 0.5f;
     [SerializeField] private LayerMask layerMask = 1 << 0;
     [SerializeField] private float gravityLockTimeWhileFlipping = 0.5f;
-
     [SerializeField] private GameObject[] flatPlaneObjects;
     [SerializeField] private GameObject[] cornerObjects;
    
@@ -18,6 +31,7 @@ public class DynamicGravityTrigger : EntityTrigger
     private Vector3 boxScale = Vector3.one;
     private Vector3 boxOffset = Vector3.zero;
     private Vector3 raycastDirection = Vector3.zero;
+    private bool isPreview = false;
     
     private void Awake()
     {
@@ -43,13 +57,32 @@ public class DynamicGravityTrigger : EntityTrigger
         boxOffset = transform.TransformDirection(boxOffset);
         #endregion
     }
+    private void Start()
+    {
+        Collider[] colliders = Physics.OverlapBox(transform.position, boxScale / 2f);
+        foreach (var col in colliders)
+        {
+            if (col.gameObject == gameObject)
+                return;
+            if (col.TryGetComponent(out DynamicGravityTrigger trig))
+            {
+                if(!trig.IsPreview)
+                    Destroy(col.gameObject);
+            }
+        }
+    }
     private void Update()
     {
+        if (!transform.hasChanged)
+            return;
+
         IsInCorner = OverlapBoxCheck();
         foreach (var obj in flatPlaneObjects)
             obj.SetActive(!IsInCorner);
         foreach (var obj in cornerObjects)
             obj.SetActive(IsInCorner);
+
+        transform.hasChanged = false;
     }
     [SerializeField] private Vector3 newGravityDirection = Vector3.up;
     protected override void OnEntityEnter(Entity _entity)
@@ -63,7 +96,9 @@ public class DynamicGravityTrigger : EntityTrigger
         {
             _entity.CurrentWalker.SetTargetRotation(-GetRaycastDirection(_entity));
         }
-        Destroy(gameObject);
+
+        if(destroyAfterEntityEntered)
+            Destroy(gameObject);
     }
 
     private Vector3 GetRaycastDirection(Entity _entity)
@@ -75,7 +110,7 @@ public class DynamicGravityTrigger : EntityTrigger
     }
     private bool OverlapBoxCheck()
     {
-        Vector3 center = transform.position + transform.forward * boxScale.z / 2f;
+        Vector3 center = transform.position;
 
         bool raycastUp = Physics.Raycast(center, transform.up, boxScale.y / 2f + checkingCornersDistance, layerMask);
         bool raycastDown = Physics.Raycast(center, -transform.up, boxScale.y / 2f + checkingCornersDistance, layerMask);
@@ -105,5 +140,9 @@ public class DynamicGravityTrigger : EntityTrigger
     public void SetPositionByPointOnPlane(Vector3 point)
     {
         transform.position = point + transform.forward * boxScale.z / 2f;
+    }
+    public Vector3 GetCenterPosition()
+    {
+        return transform.position + transform.forward * boxScale.z / 2f;
     }
 }
