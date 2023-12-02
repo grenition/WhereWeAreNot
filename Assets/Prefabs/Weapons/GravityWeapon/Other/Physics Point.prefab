@@ -11,11 +11,11 @@ GameObject:
   - component: {fileID: 2645012531364492717}
   - component: {fileID: 4935245684774214699}
   - component: {fileID: 7156091329227053183}
-  - component: {fileID: 1305858087530913583}
   - component: {fileID: 1535854988530238988}
   - component: {fileID: -5483274685615608289}
   - component: {fileID: 121303952343037177}
-  m_Layer: 0
+  - component: {fileID: 7904812524923472277}
+  m_Layer: 8
   m_Name: Physics Point
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -87,27 +87,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!135 &1305858087530913583
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5306782629942145432}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &1535854988530238988
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -127,14 +106,14 @@ Rigidbody:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 1
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!114 &-5483274685615608289
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -147,9 +126,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bc1d72f144badc4698574197345c32a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attractionVelocity: 10
+  detectingRadius: 0.5
+  attractionVelocity: 100
+  startVelocity: 0
   minDitanceBetweenPoints: 1
   lifeTime: 1
+  attractionMassScale: 500
+  destroyEffect: {fileID: 5998147195516811720, guid: ea180524122efe84fa21d4962a840ea5,
+    type: 3}
 --- !u!82 &121303952343037177
 AudioSource:
   m_ObjectHideFlags: 0
@@ -300,3 +284,18 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!138 &7904812524923472277
+FixedJoint:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5306782629942145432}
+  m_ConnectedBody: {fileID: 0}
+  m_ConnectedArticulationBody: {fileID: 0}
+  m_BreakForce: Infinity
+  m_BreakTorque: Infinity
+  m_EnableCollision: 1
+  m_EnablePreprocessing: 0
+  m_MassScale: 1
+  m_ConnectedMassScale: 500
