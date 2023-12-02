@@ -90,7 +90,7 @@ public class CameraLooking : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null)
+        if (Instance == null)
             Instance = this;
         tr = transform;
         if (walker != null)
