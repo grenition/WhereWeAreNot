@@ -9,8 +9,7 @@ using UnityEngine.AI;
 public class EnemyAI : MonoBehaviour
 {
 
-    [Header("Цель преследования")]
-    [SerializeField] Vector3 target;
+
 
     private enum StateTypes
     {
@@ -20,10 +19,12 @@ public class EnemyAI : MonoBehaviour
         Escape
     }
 
+    [Header("Текущее состояние")]
     [SerializeField] private StateTypes currentState = StateTypes.Seek;
 
     [Header("Навигационные точки")]
-    [SerializeField] bool walkPointSet;
+    [SerializeField] bool targetSet;
+    [SerializeField] Vector3 target;
     // [SerializeField] private Vector3 walkPoint;
 
     [Header("Дистанция срабатывания триггеров")]
@@ -31,15 +32,26 @@ public class EnemyAI : MonoBehaviour
     [SerializeField] float distanceToStartChase = 10f;
     [SerializeField] float distanceToStartAttack = 5f;
 
-    [Header("Действия ИИ")]
+    [Header("Параметры ИИ")]
     [Tooltip("Вероятность испугаться игрока")]
-    [SerializeField][Range(0f, 100f)] float playerFright = 30f;
+    [SerializeField][Range(0f, 100f)] float fright = 30f;
     [Tooltip("Задержка перед совершением действия (сек)")]
     [SerializeField] float reflex = 2f;
+
+    [Header("Параметры Атаки")]
+    [Tooltip("Объект для выстрела")]
+    [SerializeField] GameObject projectile;
+    [Tooltip("Позиция выстрела на объекте врага")]
+    [SerializeField] Transform shootingPoint;
+    [Tooltip("Скорость полёта снаряда")]
+    [SerializeField] float projectileVelocity = 15f;
+
+
 
 
     private NavMeshAgent navMeshAgent;
     private Vector3 initialPozition;
+    private bool isAttacking;
 
     // Start is called before the first frame update
     void Start()
@@ -53,19 +65,31 @@ public class EnemyAI : MonoBehaviour
     {
         ManageStates();
 
-        if (currentState == StateTypes.Seek) Seek();
-        if (currentState == StateTypes.Chase) Chase();
-        if (currentState == StateTypes.Attack) Attack();
-        if (currentState == StateTypes.Escape) Escape();
+        if (currentState == StateTypes.Seek && !isAttacking) Seek();
+        if (currentState == StateTypes.Chase && !isAttacking) Chase();
+        if (currentState == StateTypes.Attack && !isAttacking) StartCoroutine(Attack());
+        // if (currentState == StateTypes.Escape) Escape();
+
+        navMeshAgent.SetDestination(target);
     }
 
     void ManageStates()
     {
-        if(Vector3.Distance(Player.Instance.transform.position, transform.position) < distanceToStartChase) {
-            UpdateState(StateTypes.Chase);
-        } else {
-            UpdateState(StateTypes.Seek);
+        float distanceToPlayer = Vector3.Distance(Player.Instance.transform.position, transform.position);
+
+        if (Physics.Raycast(new Ray(transform.position, Player.Instance.transform.position - transform.position), out RaycastHit _hit, distanceToStartChase))
+        {
+            if (_hit.collider.gameObject == Player.Instance.gameObject)
+            {
+                if (distanceToPlayer < distanceToStartAttack)
+                    UpdateState(StateTypes.Attack);
+                else
+                    UpdateState(StateTypes.Chase);
+            }
+            else
+                UpdateState(StateTypes.Seek);
         }
+        else UpdateState(StateTypes.Seek);
 
     }
 
@@ -76,7 +100,7 @@ public class EnemyAI : MonoBehaviour
 
     void Seek()
     {
-        if (!walkPointSet)
+        if (!targetSet)
         {
             float randomX = Random.Range(initialPozition.x - seekRadius, initialPozition.x + seekRadius);
             // float randomY = Random.Range(-walkPointRange, walkPointRange);
@@ -84,40 +108,41 @@ public class EnemyAI : MonoBehaviour
 
             target = new Vector3(randomX, transform.position.y, randomZ);
 
-            walkPointSet = true;
-        }
-
-        if (walkPointSet)
-        {
-            navMeshAgent.SetDestination(target);
+            targetSet = true;
         }
 
         // Vector3 distanceToWalkPoint = transform.position - target;
-        if (Vector3.Distance(transform.position, target) < 1f) walkPointSet = false;
+        if (Vector3.Distance(transform.position, target) < 1f) targetSet = false;
     }
 
     void Chase()
     {
         target = Player.Instance.transform.position;
-        navMeshAgent.SetDestination(target);
-
     }
 
-    void Attack()
+    IEnumerator Attack()
     {
+        // Остановиться перед игроком
+        isAttacking = true;
+        target = transform.position;
 
+        // Выстрелить в игрока с задержкой Reflex
+
+        yield return new WaitForSeconds(reflex);
+        GameObject prj = Instantiate(projectile, shootingPoint.position, shootingPoint.rotation);
+        prj.GetComponent<Rigidbody>().velocity = (Player.Instance.transform.position - transform.position).normalized * projectileVelocity;
+        isAttacking = false;
     }
 
     void Escape()
     {
-
+        target = initialPozition;
     }
-
 
     void OnDrawGizmosSelected()
     {
         Gizmos.color = new Color(0, 255, 0);
-        Gizmos.DrawWireCube(initialPozition, new Vector3(seekRadius * 2f, 2,seekRadius * 2));
+        Gizmos.DrawWireCube(transform.position, new Vector3(seekRadius * 2f, 2, seekRadius * 2));
 
 
         Gizmos.color = new Color(0, 0, 255);
