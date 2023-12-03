@@ -91,6 +91,11 @@ public class GravityWeapon : Weapon
     [SerializeField] private float shootDelay = 0.2f;
     [SerializeField] private float changingModeDelay = 0.2f;
 
+    [Header("Keys")]
+    [SerializeField] private KeyCode changeModeKey = KeyCode.E;
+    [SerializeField] private KeyCode startPointsAttractionKey = KeyCode.F;
+    [SerializeField] private KeyCode resetPointsKey = KeyCode.R;
+
     private float blockTime = 0f;
     private DynamicGravityTrigger tempGravityTrigger;
     private float radius = 1f;
@@ -116,10 +121,12 @@ public class GravityWeapon : Weapon
     }
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(changeModeKey))
             ChangeGravityMode();
-        else if (Input.GetKeyDown(KeyCode.F))
+        else if (Input.GetKeyDown(startPointsAttractionKey))
             StartPairsAttraction();
+        else if (Input.GetKeyDown(resetPointsKey))
+            DestroyPoints();
         UpdateLinesInPairs();
         if (workMode == GravityWeaponWorkMode.Points)
         {
@@ -202,6 +209,11 @@ public class GravityWeapon : Weapon
     }
     private void OnPhysicsPointPlaced(PhysicsPoint point)
     {
+        if (point == null)
+            return;
+
+        CheckLists();
+
         point.Initialize();
         physicsPoints.Add(point);
         if(physicsPoints.Count >= 2)
@@ -215,7 +227,7 @@ public class GravityWeapon : Weapon
                 return; 
             }
             
-            CheckPairsList();
+            CheckLists();
             if (physicsPairs.Count >= maxPairsCount)
             {
                 physicsPairs[0].DestroyPair();
@@ -236,20 +248,44 @@ public class GravityWeapon : Weapon
     }
     private void StartPairsAttraction()
     {
-        CheckPairsList();
+        CheckLists();
         foreach (var pair in physicsPairs)
         {
             pair.StartPointsAttraction();
         }
     }
+    private void CheckLists()
+    {
+        CheckPairsList();
+        CheckPointsList();
+    }
     private void CheckPairsList()
     {
         List<PhysicsPair> tempList = new List<PhysicsPair>();
-        foreach(var pair in physicsPairs)
+        foreach (var pair in physicsPairs)
         {
             if (!pair.IsEmpty())
                 tempList.Add(pair);
         }
         physicsPairs = tempList;
+    }
+    private void CheckPointsList()
+    {
+        List<PhysicsPoint> tempList = new List<PhysicsPoint>();
+        foreach (var point in physicsPoints)
+        {
+            if (point != null)
+                tempList.Add(point);
+        }
+        physicsPoints = tempList;
+    }
+    private void DestroyPoints()
+    {
+        CheckLists();
+        foreach (var point in physicsPoints)
+            point.DestroyPoint();
+        foreach (var pair in physicsPairs)
+            pair.DestroyPair();
+        CheckLists();
     }
 }
