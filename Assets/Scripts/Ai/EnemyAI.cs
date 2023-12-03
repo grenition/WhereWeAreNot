@@ -1,7 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -27,14 +25,12 @@ public class EnemyAI : MonoBehaviour
     [Header("Навигационное состояние")]
     [SerializeField] private StateTypes currentState = StateTypes.Seek;
     [SerializeField] Vector3 target;
-    [SerializeField] bool targetSet;
-    // [SerializeField] private Vector3 walkPoint;
+    [SerializeField] bool seekPointSet;
 
     [Header("Дистанция срабатывания триггеров")]
     [SerializeField] float seekRadius = 15f;
     [SerializeField] float distanceToStartChase = 10f;
     [SerializeField] float distanceToStartAttack = 5f;
-
 
     [Header("Параметры Атаки")]
     [Tooltip("Центр вращения объекта")]
@@ -50,7 +46,6 @@ public class EnemyAI : MonoBehaviour
     private bool isAttacking;
     private bool isEscaping;
 
-
     private Walker walker;
     private NavMeshPath path;
     private float pathFindingTargetTime = 0f;
@@ -65,17 +60,24 @@ public class EnemyAI : MonoBehaviour
         initialPozition = transform.position;
     }
 
-
     // Update is called once per frame
     void FixedUpdate()
     {
         ManageStates();
 
-        if (currentState == StateTypes.Seek && !isAttacking) Seek();
-        if (currentState == StateTypes.Chase && !isAttacking) Chase();
-        if (currentState == StateTypes.Attack && !isAttacking) StartCoroutine(Attack());
-        if (currentState == StateTypes.Escape) Escape();
+        switch (currentState)
+        {
+            case StateTypes.Seek: SeekTarget(); break;
+            case StateTypes.Chase: ChaseTarget(); break;
+            case StateTypes.Attack: StartCoroutine(AttackTarget()); break;
+            case StateTypes.Escape: EscapeToInitialPoint(); break;
+        }
 
+        WalkToTarget();
+    }
+
+    void WalkToTarget()
+    {
         if (target == null)
             return;
 
@@ -89,51 +91,46 @@ public class EnemyAI : MonoBehaviour
         {
             Debug.DrawLine(path.corners[i], path.corners[i + 1], Color.red);
         }
-
         if (pathCorrect && path.corners.Length < 2)
             return;
 
         Vector3 direction = (target - transform.position).normalized;
-        if (pathCorrect)
-            direction = (path.corners[1] - path.corners[0]).normalized;
 
-
+        if (pathCorrect) direction = (path.corners[1] - path.corners[0]).normalized;
         if (!isAttacking)
         {
             rotationBody.rotation = Quaternion.LookRotation(Vector3.RotateTowards(rotationBody.forward, direction, 720 * Time.deltaTime, 0f));
             walker.MoveOnPlane(direction * movementSpeed);
         }
-
-
+        else
+        {
+            walker.MoveOnPlane(Vector3.zero);
+        }
     }
 
     void ManageStates()
     {
-        if(isEscaping && Vector3.Distance(transform.position, initialPozition) > 3f) return;
+        if (currentState != StateTypes.Seek) seekPointSet = false;
+
+        if (isEscaping && Vector3.Distance(transform.position, initialPozition) > 3f) return;
         isEscaping = false;
-        
 
         if (isAttacking) return;
 
-
         float distanceToPlayer = Vector3.Distance(Player.Instance.transform.position, transform.position);
 
-        if (Physics.Raycast(new Ray(transform.position, Player.Instance.transform.position - transform.position), out RaycastHit _hit, distanceToStartChase))
+        bool ifHit = Physics.Raycast(new Ray(transform.position, Player.Instance.transform.position - transform.position), out RaycastHit _hit, distanceToStartChase);
+
+        if (ifHit && _hit.collider.gameObject == Player.Instance.gameObject)
         {
-            if (_hit.collider.gameObject == Player.Instance.gameObject)
-            {
-                if(Random.Range(0f, 100f) < fright)  
-                    UpdateState(StateTypes.Escape);
-                else if (distanceToPlayer < distanceToStartAttack)
-                    UpdateState(StateTypes.Attack);
-                else
-                    UpdateState(StateTypes.Chase);
-            }
+            if (Random.Range(0f, 100f) < fright)
+                UpdateState(StateTypes.Escape);
+            else if (distanceToPlayer < distanceToStartAttack)
+                UpdateState(StateTypes.Attack);
             else
-                UpdateState(StateTypes.Seek);
+                UpdateState(StateTypes.Chase);
         }
         else UpdateState(StateTypes.Seek);
-
     }
 
     void UpdateState(StateTypes newState)
@@ -141,30 +138,28 @@ public class EnemyAI : MonoBehaviour
         currentState = newState;
     }
 
-    void Seek()
+    void SeekTarget()
     {
-        if (!targetSet || Vector3.Distance(transform.position, target) < 1.5f)
+        if (!seekPointSet || Vector3.Distance(transform.position, target) < 1.5f)
         {
             float randomX = Random.Range(initialPozition.x - seekRadius, initialPozition.x + seekRadius);
-            // float randomY = Random.Range(-walkPointRange, walkPointRange);
             float randomZ = Random.Range(initialPozition.z - seekRadius, initialPozition.z + seekRadius);
 
             Vector3 randomPoint = new Vector3(randomX, transform.position.y, randomZ);
 
             target = randomPoint;
-            targetSet = true;
+            seekPointSet = true;
         }
 
-        // Vector3 distanceToWalkPoint = transform.position - target;
-        if (Vector3.Distance(transform.position, target) < 1.5f) targetSet = false;
+        if (Vector3.Distance(transform.position, target) < 1.5f) seekPointSet = false;
     }
 
-    void Chase()
+    void ChaseTarget()
     {
         target = Player.Instance.transform.position;
     }
 
-    IEnumerator Attack()
+    IEnumerator AttackTarget()
     {
         // Остановиться перед игроком
         isAttacking = true;
@@ -178,7 +173,7 @@ public class EnemyAI : MonoBehaviour
         isAttacking = false;
     }
 
-    void Escape()
+    void EscapeToInitialPoint()
     {
         isEscaping = true;
         target = initialPozition;

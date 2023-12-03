@@ -282,7 +282,7 @@ Transform:
   m_GameObject: {fileID: 2390332365404038817}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 2}
+  m_LocalPosition: {x: 0, y: 0, z: 2.25}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -346,8 +346,8 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 1.25
-  m_Height: 2.5
+  m_Radius: 1
+  m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &1203462876521970472
@@ -389,9 +389,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0c713648bfad0547b0330e30167c998, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movementSpeed: 5
-  reflex: 2
-  fright: 30
+  movementSpeed: 15
+  fright: 0
+  reflex: 0.5
   currentState: 0
   target: {x: 0, y: 0, z: 0}
   targetSet: 0
@@ -445,6 +445,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2630d48a992cb7429644612857e8d1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  destructOnCollision: 0
+  destructVelocity: 10
+  destructionEffect: {fileID: 0}
+  minVelocityToVisualizeCollision: 3
+  source: {fileID: 0}
+  collisionResources: {fileID: 0}
 --- !u!1001 &559173318171630023
 PrefabInstance:
   m_ObjectHideFlags: 0
