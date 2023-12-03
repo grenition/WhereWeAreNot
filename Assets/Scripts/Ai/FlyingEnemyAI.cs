@@ -129,13 +129,7 @@ public class FlyingEnemyAI : MonoBehaviour
             float randomZ = Random.Range(initialPozition.z - seekRadius, initialPozition.z + seekRadius);
 
             Vector3 randomPoint = new Vector3(randomX, randomY, randomZ);
-
-            if (Vector3.Distance(randomPoint, transform.position) < 3f)
-            {
-                Seek();
-                return;
-            }
-
+            
             target = randomPoint;
             targetSet = true;
         }

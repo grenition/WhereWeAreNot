@@ -144,7 +144,7 @@ PrefabInstance:
     - target: {fileID: 4053510712209257951, guid: 8d3078142a591e349b35bbd0f35f834e,
         type: 3}
       propertyPath: fright
-      value: 90.2
+      value: 3.5
       objectReference: {fileID: 0}
     - target: {fileID: 4053510712209257951, guid: 8d3078142a591e349b35bbd0f35f834e,
         type: 3}
@@ -160,6 +160,21 @@ PrefabInstance:
         type: 3}
       propertyPath: distanceToStartAttack
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 6290180015318796726, guid: 8d3078142a591e349b35bbd0f35f834e,
+        type: 3}
+      propertyPath: Priority
+      value: 142
+      objectReference: {fileID: 0}
+    - target: {fileID: 6290180015318796726, guid: 8d3078142a591e349b35bbd0f35f834e,
+        type: 3}
+      propertyPath: MaxDistance
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 6290180015318796726, guid: 8d3078142a591e349b35bbd0f35f834e,
+        type: 3}
+      propertyPath: spreadCustomCurve.m_Curve.Array.data[0].value
+      value: 0.083333336
       objectReference: {fileID: 0}
     - target: {fileID: 6933227618977627541, guid: 8d3078142a591e349b35bbd0f35f834e,
         type: 3}

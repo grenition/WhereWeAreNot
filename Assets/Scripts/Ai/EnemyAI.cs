@@ -19,10 +19,10 @@ public class EnemyAI : MonoBehaviour
     [Header("Параметры ИИ")]
     [Tooltip("Cкорость передвижения")]
     [SerializeField] float movementSpeed = 5f;
-    [Tooltip("Задержка перед совершением действия (сек)")]
-    [SerializeField] float reflex = 2f;
     [Tooltip("Вероятность испугаться игрока")]
     [SerializeField][Range(0f, 100f)] float fright = 30f;
+    [Tooltip("Задержка перед совершением действия (сек)")]
+    [SerializeField] float reflex = 2f;
 
     [Header("Навигационное состояние")]
     [SerializeField] private StateTypes currentState = StateTypes.Seek;
@@ -45,7 +45,6 @@ public class EnemyAI : MonoBehaviour
     [SerializeField] GameObject projectile;
     [Tooltip("Скорость полёта снаряда")]
     [SerializeField] float projectileVelocity = 15f;
-
 
     private Vector3 initialPozition;
     private bool isAttacking;
@@ -151,12 +150,6 @@ public class EnemyAI : MonoBehaviour
             float randomZ = Random.Range(initialPozition.z - seekRadius, initialPozition.z + seekRadius);
 
             Vector3 randomPoint = new Vector3(randomX, transform.position.y, randomZ);
-
-            if (Vector3.Distance(randomPoint, transform.position) < 3f)
-            {
-                Seek();
-                return;
-            }
 
             target = randomPoint;
             targetSet = true;
