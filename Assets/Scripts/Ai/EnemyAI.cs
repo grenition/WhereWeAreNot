@@ -5,12 +5,9 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
-
+[RequireComponent(typeof(Walker))]
 public class EnemyAI : MonoBehaviour
 {
-
-
-
     private enum StateTypes
     {
         Seek,
@@ -19,10 +16,16 @@ public class EnemyAI : MonoBehaviour
         Escape
     }
 
-    [Header("Текущее состояние")]
-    [SerializeField] private StateTypes currentState = StateTypes.Seek;
+    [Header("Параметры ИИ")]
+    [Tooltip("Cкорость передвижения")]
+    [SerializeField] float movementSpeed = 5f;
+    [Tooltip("Вероятность испугаться игрока")]
+    [SerializeField][Range(0f, 100f)] float fright = 30f;
+    [Tooltip("Задержка перед совершением действия (сек)")]
+    [SerializeField] float reflex = 2f;
 
-    [Header("Навигационные точки")]
+    [Header("Навигационное состояние")]
+    [SerializeField] private StateTypes currentState = StateTypes.Seek;
     [SerializeField] bool targetSet;
     [SerializeField] Vector3 target;
     // [SerializeField] private Vector3 walkPoint;
@@ -32,36 +35,38 @@ public class EnemyAI : MonoBehaviour
     [SerializeField] float distanceToStartChase = 10f;
     [SerializeField] float distanceToStartAttack = 5f;
 
-    [Header("Параметры ИИ")]
-    [Tooltip("Вероятность испугаться игрока")]
-    [SerializeField][Range(0f, 100f)] float fright = 30f;
-    [Tooltip("Задержка перед совершением действия (сек)")]
-    [SerializeField] float reflex = 2f;
 
     [Header("Параметры Атаки")]
+    [Tooltip("Центр вращения объекта")]
+    [SerializeField] Transform rotationBody;
+    [Tooltip("Позиция выстрела на объекте")]
+    [SerializeField] Transform shootingPoint;
     [Tooltip("Объект для выстрела")]
     [SerializeField] GameObject projectile;
-    [Tooltip("Позиция выстрела на объекте врага")]
-    [SerializeField] Transform shootingPoint;
     [Tooltip("Скорость полёта снаряда")]
     [SerializeField] float projectileVelocity = 15f;
 
 
-
-
-    private NavMeshAgent navMeshAgent;
     private Vector3 initialPozition;
     private bool isAttacking;
+
+    private Walker walker;
+    private NavMeshPath path;
+    private float pathFindingTargetTime = 0f;
+    private float pathFindingInterval = 0.1f;
+    private bool pathCorrect = false;
 
     // Start is called before the first frame update
     void Start()
     {
-        navMeshAgent = GetComponent<NavMeshAgent>();
+        walker = GetComponent<Walker>();
+        path = new NavMeshPath();
         initialPozition = transform.position;
     }
 
+
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         ManageStates();
 
@@ -70,11 +75,42 @@ public class EnemyAI : MonoBehaviour
         if (currentState == StateTypes.Attack && !isAttacking) StartCoroutine(Attack());
         // if (currentState == StateTypes.Escape) Escape();
 
-        navMeshAgent.SetDestination(target);
+        if (target == null)
+            return;
+
+        if (Time.time > pathFindingTargetTime)
+        {
+            pathCorrect = NavMesh.CalculatePath(transform.position, target, NavMesh.AllAreas, path);
+            pathFindingTargetTime = Time.time + pathFindingInterval;
+        }
+
+        for (int i = 0; i < path.corners.Length - 1; i++)
+        {
+            Debug.DrawLine(path.corners[i], path.corners[i + 1], Color.red);
+        }
+
+        if (pathCorrect && path.corners.Length < 2)
+            return;
+
+        Vector3 direction = (target - transform.position).normalized;
+        if (pathCorrect)
+            direction = (path.corners[1] - path.corners[0]).normalized;
+
+
+        if (!isAttacking)
+        {
+            rotationBody.rotation = Quaternion.LookRotation(Vector3.RotateTowards(rotationBody.forward, direction, 720 * Time.deltaTime, 0f));
+            walker.MoveOnPlane(direction * movementSpeed);
+        }
+
+
     }
 
     void ManageStates()
     {
+        if (isAttacking) return;
+
+
         float distanceToPlayer = Vector3.Distance(Player.Instance.transform.position, transform.position);
 
         if (Physics.Raycast(new Ray(transform.position, Player.Instance.transform.position - transform.position), out RaycastHit _hit, distanceToStartChase))
@@ -100,19 +136,26 @@ public class EnemyAI : MonoBehaviour
 
     void Seek()
     {
-        if (!targetSet)
+        if (!targetSet || Vector3.Distance(transform.position, target) < 1.5f)
         {
             float randomX = Random.Range(initialPozition.x - seekRadius, initialPozition.x + seekRadius);
             // float randomY = Random.Range(-walkPointRange, walkPointRange);
             float randomZ = Random.Range(initialPozition.z - seekRadius, initialPozition.z + seekRadius);
 
-            target = new Vector3(randomX, transform.position.y, randomZ);
+            Vector3 randomPoint = new Vector3(randomX, transform.position.y, randomZ);
 
+            if (Vector3.Distance(randomPoint, transform.position) < 3f)
+            {
+                Seek();
+                return;
+            }
+
+            target = randomPoint;
             targetSet = true;
         }
 
         // Vector3 distanceToWalkPoint = transform.position - target;
-        if (Vector3.Distance(transform.position, target) < 1f) targetSet = false;
+        if (Vector3.Distance(transform.position, target) < 1.5f) targetSet = false;
     }
 
     void Chase()
