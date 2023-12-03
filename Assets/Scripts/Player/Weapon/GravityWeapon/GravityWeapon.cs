@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public delegate void GravityWeaponWorkModeEventHandler(GravityWeaponWorkMode workMode);
 public enum GravityWeaponWorkMode
@@ -22,7 +23,7 @@ public class PhysicsPair
             return;
 
         if (currentLine == null)
-            currentLine = Object.Instantiate(prefab);
+            currentLine = UnityEngine.Object.Instantiate(prefab);
         currentLine.SetPositions(new Vector3[] { point1.transform.position, point2.transform.position });
     }
     public void UpdateLineBetweenPoints()
@@ -53,7 +54,7 @@ public class PhysicsPair
         point1.DestroyPoint();
         point2.DestroyPoint();
         if (currentLine != null)
-            Object.Destroy(currentLine);
+            UnityEngine.Object.Destroy(currentLine);
     }
     public void StartPointsAttraction()
     {
@@ -85,6 +86,12 @@ public class GravityWeapon : Weapon
     [SerializeField] private Transform barrelEnd;
     [SerializeField] private float maxDistance = 100f;
 
+    [Header("Delays")]
+    [SerializeField] private float openTime = 0.3f;
+    [SerializeField] private float shootDelay = 0.2f;
+    [SerializeField] private float changingModeDelay = 0.2f;
+
+    private float blockTime = 0f;
     private DynamicGravityTrigger tempGravityTrigger;
     private float radius = 1f;
     private List<DynamicGravityTrigger> spawnedTriggers = new List<DynamicGravityTrigger>();
@@ -93,6 +100,8 @@ public class GravityWeapon : Weapon
     [SerializeField] private List<PhysicsPair> physicsPairs = new List<PhysicsPair>();
 
     public event GravityWeaponWorkModeEventHandler OnWorkModeChanged;
+    public Action OnPointsModeShooted;
+    public Action OnGravityChangingModeShooted;
 
     private void Start()
     {
@@ -100,6 +109,10 @@ public class GravityWeapon : Weapon
         tempGravityTrigger.IsPreview = true;
 
         radius = tempGravityTrigger.BoxScale.z / 2f + 0.01f;
+    }
+    private void OnEnable()
+    {
+        blockTime = Time.realtimeSinceStartup + changingModeDelay;
     }
     void Update()
     {
@@ -136,7 +149,7 @@ public class GravityWeapon : Weapon
     }
     private void PlaceChangingGravityCube()
     {
-        if (gravityTriggerPrefab == null)
+        if (gravityTriggerPrefab == null || Time.realtimeSinceStartup < blockTime)
             return;
         if(Physics.SphereCast(transform.position, radius, transform.forward, out RaycastHit hit, maxDistance))
         {
@@ -160,17 +173,23 @@ public class GravityWeapon : Weapon
                     Destroy(temp);
                 }
                 spawnedTriggers.Add(trigger);
+
+                OnGravityChangingModeShooted?.Invoke();
+                blockTime = Time.realtimeSinceStartup + shootDelay;
             }
         }
     }
     private void ShootPhysicsPoint()
     {
-        if (bulletPrefab == null || CameraLooking.Instance.CameraTransform == null)
+        if (bulletPrefab == null || CameraLooking.Instance.CameraTransform == null || Time.realtimeSinceStartup < blockTime)
             return;
         Transform cam = CameraLooking.Instance.CameraTransform;
         Bullet bul = Instantiate(bulletPrefab, bulletsOut.position, bulletsOut.rotation);
         bul.AddForce(cam.forward * bulletsSpeed);
         bul.OnPhysicsPointSpawned += OnPhysicsPointPlaced;
+
+        OnPointsModeShooted?.Invoke();
+        blockTime = Time.realtimeSinceStartup + shootDelay;
     }
     private void ChangeGravityMode()
     {
@@ -179,6 +198,7 @@ public class GravityWeapon : Weapon
         else if (workMode == GravityWeaponWorkMode.ChangingGravity)
             workMode = GravityWeaponWorkMode.Points;
         OnWorkModeChanged?.Invoke(workMode);
+        blockTime = Time.realtimeSinceStartup + changingModeDelay;
     }
     private void OnPhysicsPointPlaced(PhysicsPoint point)
     {

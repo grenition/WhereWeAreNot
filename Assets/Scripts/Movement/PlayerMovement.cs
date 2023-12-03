@@ -241,6 +241,7 @@ public class PlayerMovement : MonoBehaviour
         currentData.distanceToGround = walker.DistanceToGround;
         currentData.isCrouching = isCrouching;
         currentData.crouchStep = 1f - ((walker.Height - crouchingMinHeight) / (crouchingMaxHeight - crouchingMinHeight));
+        currentData.isRunning = isRunning;
 
         inputData.crouching = currentData.movement.y == -1f;
 
@@ -393,7 +394,10 @@ public class PlayerMovement : MonoBehaviour
             case MovementEnvironment.onGround:
                 isRunning = inputData.running;
                 if (isCrouching)
+                {
                     _targetSpeed = crouchingSpeed;
+                    isRunning = false;
+                }
                 else if (isRunning && !lockRunning)
                 {
                     if (inputDirection.z > 0.9f && !lockForwardRunning)
@@ -402,7 +406,10 @@ public class PlayerMovement : MonoBehaviour
                         _targetSpeed = runningSpeed;
                 }
                 else
+                {
                     _targetSpeed = walkingSpeed;
+                    isRunning = false;
+                }
                 break;
             case MovementEnvironment.inAir:
                 _targetSpeed = flyingSpeed;
