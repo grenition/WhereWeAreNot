@@ -14,9 +14,13 @@ public class GlobalPostProcessing : MonoBehaviour
 {
     public static GlobalPostProcessing Instance { get; private set; }
 
+    [Header("Base Volume")]
     [SerializeField] private VolumeProfile defaultProfile;
     [SerializeField] private VolumeProfile bulletTimeProfile;
     [SerializeField] private float transitionTime = 0.3f;
+
+    [Header("Health Volume")]
+    [SerializeField] private Volume healthVolume;
 
     private Volume volume;
     private Volume tempVolume;
@@ -72,5 +76,12 @@ public class GlobalPostProcessing : MonoBehaviour
                 Instance.SetNewProfile(Instance.bulletTimeProfile, Instance.transitionTime);
                 break;
         }
+    }
+
+    public static void SetHealthVolumeWeight(float weight)
+    {
+        if (Instance == null || Instance.healthVolume == null)
+            return;
+        Instance.healthVolume.weight = weight;
     }
 }

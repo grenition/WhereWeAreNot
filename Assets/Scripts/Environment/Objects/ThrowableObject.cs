@@ -15,12 +15,19 @@ public class ThrowableObject : MonoBehaviour
     [Header("Collisions")]
     [SerializeField] private float minVelocityToVisualizeCollision = 3f;
     [SerializeField] private AudioSource source;
-    [SerializeField] private CollisionResources collisionResources; 
+    [SerializeField] private CollisionResources collisionResources;
+
+    [Header("Health damage")]
+    [SerializeField] private bool allowCollisionDamage = true;
+    [SerializeField] private float velocityToDamage = 20f;
+    [SerializeField] private float damagePer100kg = 50f;
 
     private Rigidbody rb;
+    private Health health;
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        health = GetComponent<Health>();
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -33,6 +40,13 @@ public class ThrowableObject : MonoBehaviour
             VisualizeCollision(collision.contacts[0].point, collision.contacts[0].normal);
         if (destructOnCollision && velocity > destructVelocity)
             Destruct();
+        if(allowCollisionDamage && health != null && velocity > velocityToDamage)
+        {
+            float otherMass = 0f;
+            if (collision.collider.TryGetComponent(out Rigidbody otherRb))
+                otherMass += otherRb.mass;
+            health.Damage(damagePer100kg * (rb.mass + otherMass) / 100f);
+        }
     }
     public void VisualizeCollision(Vector3 point, Vector3 normal)
     {
