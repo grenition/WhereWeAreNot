@@ -139,12 +139,17 @@ PrefabInstance:
     - target: {fileID: 2700094328338800672, guid: 8d3078142a591e349b35bbd0f35f834e,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4053510712209257951, guid: 8d3078142a591e349b35bbd0f35f834e,
+        type: 3}
+      propertyPath: fright
+      value: 90.2
       objectReference: {fileID: 0}
     - target: {fileID: 4053510712209257951, guid: 8d3078142a591e349b35bbd0f35f834e,
         type: 3}
       propertyPath: seekRadius
-      value: 10
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 4053510712209257951, guid: 8d3078142a591e349b35bbd0f35f834e,
         type: 3}
@@ -939,6 +944,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: FlyingEnemy
+      objectReference: {fileID: 0}
+    - target: {fileID: 2700094328338800672, guid: 1ca49dd851eb2714ebc9638a3ac5e00f,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6933227618977627541, guid: 1ca49dd851eb2714ebc9638a3ac5e00f,
         type: 3}

@@ -49,18 +49,15 @@ public class FlyingEnemyAI : MonoBehaviour
 
     private Vector3 initialPozition;
     private bool isAttacking;
+    private bool isEscaping;
 
     private Walker walker;
-    private NavMeshPath path;
-    private float pathFindingTargetTime = 0f;
-    private float pathFindingInterval = 0.1f;
-    private bool pathCorrect = false;
+
 
     // Start is called before the first frame update
     void Start()
     {
         walker = GetComponent<Walker>();
-        path = new NavMeshPath();
         initialPozition = transform.position;
     }
 
@@ -73,6 +70,7 @@ public class FlyingEnemyAI : MonoBehaviour
         if (currentState == StateTypes.Seek && !isAttacking) Seek();
         if (currentState == StateTypes.Chase && !isAttacking) Chase();
         if (currentState == StateTypes.Attack && !isAttacking) StartCoroutine(Attack());
+        if (currentState == StateTypes.Escape) Escape();
 
 
         Vector3 direction = (target - transform.position).normalized;
@@ -82,7 +80,9 @@ public class FlyingEnemyAI : MonoBehaviour
         {
             rotationBody.rotation = Quaternion.LookRotation(Vector3.RotateTowards(rotationBody.forward, direction, 720 * Time.deltaTime, 0f));
             walker.MoveInExtraMode(direction * movementSpeed);
-        } else {
+        }
+        else
+        {
             walker.MoveInExtraMode(Vector3.zero);
         }
 
@@ -91,6 +91,9 @@ public class FlyingEnemyAI : MonoBehaviour
 
     void ManageStates()
     {
+        if (isEscaping && Vector3.Distance(transform.position, initialPozition) > 3f) return;
+        isEscaping = false;
+
         if (isAttacking) return;
 
 
@@ -162,6 +165,7 @@ public class FlyingEnemyAI : MonoBehaviour
 
     void Escape()
     {
+        isEscaping = true;
         target = initialPozition;
     }
 

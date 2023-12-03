@@ -19,15 +19,15 @@ public class EnemyAI : MonoBehaviour
     [Header("Параметры ИИ")]
     [Tooltip("Cкорость передвижения")]
     [SerializeField] float movementSpeed = 5f;
-    [Tooltip("Вероятность испугаться игрока")]
-    [SerializeField][Range(0f, 100f)] float fright = 30f;
     [Tooltip("Задержка перед совершением действия (сек)")]
     [SerializeField] float reflex = 2f;
+    [Tooltip("Вероятность испугаться игрока")]
+    [SerializeField][Range(0f, 100f)] float fright = 30f;
 
     [Header("Навигационное состояние")]
     [SerializeField] private StateTypes currentState = StateTypes.Seek;
-    [SerializeField] bool targetSet;
     [SerializeField] Vector3 target;
+    [SerializeField] bool targetSet;
     // [SerializeField] private Vector3 walkPoint;
 
     [Header("Дистанция срабатывания триггеров")]
@@ -49,6 +49,8 @@ public class EnemyAI : MonoBehaviour
 
     private Vector3 initialPozition;
     private bool isAttacking;
+    private bool isEscaping;
+
 
     private Walker walker;
     private NavMeshPath path;
@@ -73,7 +75,7 @@ public class EnemyAI : MonoBehaviour
         if (currentState == StateTypes.Seek && !isAttacking) Seek();
         if (currentState == StateTypes.Chase && !isAttacking) Chase();
         if (currentState == StateTypes.Attack && !isAttacking) StartCoroutine(Attack());
-        // if (currentState == StateTypes.Escape) Escape();
+        if (currentState == StateTypes.Escape) Escape();
 
         if (target == null)
             return;
@@ -108,6 +110,10 @@ public class EnemyAI : MonoBehaviour
 
     void ManageStates()
     {
+        if(isEscaping && Vector3.Distance(transform.position, initialPozition) > 3f) return;
+        isEscaping = false;
+        
+
         if (isAttacking) return;
 
 
@@ -117,7 +123,9 @@ public class EnemyAI : MonoBehaviour
         {
             if (_hit.collider.gameObject == Player.Instance.gameObject)
             {
-                if (distanceToPlayer < distanceToStartAttack)
+                if(Random.Range(0f, 100f) < fright)  
+                    UpdateState(StateTypes.Escape);
+                else if (distanceToPlayer < distanceToStartAttack)
                     UpdateState(StateTypes.Attack);
                 else
                     UpdateState(StateTypes.Chase);
@@ -179,13 +187,14 @@ public class EnemyAI : MonoBehaviour
 
     void Escape()
     {
+        isEscaping = true;
         target = initialPozition;
     }
 
     void OnDrawGizmosSelected()
     {
         Gizmos.color = new Color(0, 255, 0);
-        Gizmos.DrawWireCube(transform.position, new Vector3(seekRadius * 2f, 2, seekRadius * 2));
+        Gizmos.DrawWireCube(initialPozition, new Vector3(seekRadius * 2f, 2, seekRadius * 2));
 
 
         Gizmos.color = new Color(0, 0, 255);
