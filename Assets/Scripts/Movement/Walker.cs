@@ -55,6 +55,7 @@ public class Walker : MonoBehaviour
     #endregion
 
     #region Public values
+    public float VelocityMultiplier { get => velocityMultiplier; set { velocityMultiplier = value; } }
     public WalkerState CurrentState { get => state; }
     public bool IsSliding { get => isSliding; }
     public float DistanceToGround { get => distanceToGround; }
@@ -63,6 +64,7 @@ public class Walker : MonoBehaviour
     public float Radius { get => radius; set { radius = value; } }
     public Vector3 Center { get => center; set { center = value; } }
     public float ColliderHeight { get => collider.height; }
+    public bool ApplyVelocityMultiplierToGravity { get; set; }
     public bool LockMovement 
     {   
         get => lockMovement; 
@@ -77,6 +79,7 @@ public class Walker : MonoBehaviour
     #endregion
 
     #region Local values
+    public float velocityMultiplier = 1f;
     private bool lockMovement = false;
     private WalkerState state = WalkerState.inAir;
     private Vector3 physicsMomentum = Vector3.zero;
@@ -140,7 +143,7 @@ public class Walker : MonoBehaviour
             groundAdjustmentVelocity = CalculateGroundAdjustmentVelocity();
 
             savedExtraMomentum = extraMovementVelocity;
-            rb.velocity = groundAdjustmentVelocity + savedExtraMomentum + savedAfterEnterExtraMomentum;
+            rb.velocity = (groundAdjustmentVelocity + savedExtraMomentum + savedAfterEnterExtraMomentum) * VelocityMultiplier;
 
             //damping
             if (savedAfterEnterExtraMomentum.sqrMagnitude > 0)
@@ -154,7 +157,7 @@ public class Walker : MonoBehaviour
         }
         else
         {
-            groundAdjustmentVelocity = CalculateGroundAdjustmentVelocity();
+            groundAdjustmentVelocity = CalculateGroundAdjustmentVelocity() / VelocityMultiplier;
             Vector3 _movementVelocity = CalculateMovementVelocity();
             CalculatePhysicsMomentum();
             if (isSliding)
@@ -162,7 +165,7 @@ public class Walker : MonoBehaviour
                 physicsMomentum = Vector3.ProjectOnPlane(physicsMomentum, groundCollisionNormal);
                 _movementVelocity = Vector3.ProjectOnPlane(_movementVelocity, groundCollisionNormal);
             }
-            rb.velocity = physicsMomentum + groundAdjustmentVelocity + _movementVelocity;
+            rb.velocity = (physicsMomentum + groundAdjustmentVelocity + _movementVelocity) * VelocityMultiplier;
             if (state == WalkerState.onGround)
             {
                 onGroundMovementVelocity = Vector3.zero;
@@ -212,7 +215,11 @@ public class Walker : MonoBehaviour
             Vector3 _dir = -tr.up;
             if (Time.time < ignoreFlippingTime)
                 _dir = -targetRotationNormal;
-            physicsMomentum += _dir * Physics.gravity.magnitude * Time.fixedDeltaTime;
+
+            float mult = 1f;
+            if (ApplyVelocityMultiplierToGravity)
+                mult = VelocityMultiplier;
+            physicsMomentum += _dir * Physics.gravity.magnitude * Time.fixedDeltaTime * mult;
         }
     }
     private WalkerState GetCurrentState()
@@ -232,7 +239,7 @@ public class Walker : MonoBehaviour
         {
             WalkerData _data = new WalkerData
             {
-                velocity = rb.velocity,
+                velocity = rb.velocity / VelocityMultiplier,
                 oldState = state,
                 newState = _state
             };
@@ -307,7 +314,7 @@ public class Walker : MonoBehaviour
         {
             WalkerData _data = new WalkerData
             {
-                velocity = rb.velocity,
+                velocity = rb.velocity / VelocityMultiplier,
                 oldState = state,
                 newState = _currentState
             };
@@ -479,7 +486,7 @@ public class Walker : MonoBehaviour
     {
         if (!isSliding)
             physicsMomentum = Vector3.zero;
-        airMovementVelocity = Vector3.ProjectOnPlane(rb.velocity, tr.up);
+        airMovementVelocity = Vector3.ProjectOnPlane(rb.velocity / VelocityMultiplier, tr.up);
         exitDistanceToGround = 0f;
     }
     private void OnGroundExit(WalkerData _data)

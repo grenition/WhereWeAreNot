@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class GravityWeaponUI : MonoBehaviour
@@ -9,7 +10,6 @@ public class GravityWeaponUI : MonoBehaviour
 
     [Header("UI")]
     [SerializeField] private TMP_Text weaponModeText;
-
     private void OnEnable()
     {
         if (gravityWeapon == null)
