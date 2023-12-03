@@ -6,6 +6,8 @@ using UnityEngine;
 public class Projectile : MonoBehaviour
 {
     [SerializeField] public float lifeTime = 5f;
+    [SerializeField] public float damage = 15f;
+
 
     void Start() {
         StartCoroutine(DestroyAfterLifeTime());
@@ -19,7 +21,7 @@ public class Projectile : MonoBehaviour
 
     void OnCollisionEnter(Collision collision) {
         if(collision.gameObject == Player.Instance.gameObject) {
-            
+            Player.Instance.GetComponent<Health>().Damage(damage);
         }
 
         Destroy(gameObject);
