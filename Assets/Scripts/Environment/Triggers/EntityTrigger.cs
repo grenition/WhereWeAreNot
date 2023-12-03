@@ -13,6 +13,10 @@ public class EntityTrigger : MonoBehaviour
     private List<Entity> entities = new List<Entity>();
 
     [SerializeField] private bool triggerEnabled = true;
+    private void Awake()
+    {
+        gameObject.layer = 2;
+    }
     private void OnTriggerEnter(Collider other)
     {
         if (!triggerEnabled)
