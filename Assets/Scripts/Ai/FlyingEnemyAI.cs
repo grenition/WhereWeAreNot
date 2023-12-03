@@ -65,12 +65,15 @@ public class FlyingEnemyAI : MonoBehaviour
     {
         ManageStates();
 
-        switch (currentState)
+        if (!isAttacking)
         {
-            case StateTypes.Seek: SeekTarget(); break;
-            case StateTypes.Chase: ChaseTarget(); break;
-            case StateTypes.Attack: StartCoroutine(AttackTarget()); break;
-            case StateTypes.Escape: EscapeToInitialPoint(); break;
+            switch (currentState)
+            {
+                case StateTypes.Seek: SeekTarget(); break;
+                case StateTypes.Chase: ChaseTarget(); break;
+                case StateTypes.Attack: StartCoroutine(AttackTarget()); break;
+                case StateTypes.Escape: EscapeToInitialPoint(); break;
+            }
         }
 
         WalkToTarget();

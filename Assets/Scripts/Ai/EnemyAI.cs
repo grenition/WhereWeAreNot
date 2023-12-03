@@ -65,12 +65,15 @@ public class EnemyAI : MonoBehaviour
     {
         ManageStates();
 
-        switch (currentState)
+        if (!isAttacking)
         {
-            case StateTypes.Seek: SeekTarget(); break;
-            case StateTypes.Chase: ChaseTarget(); break;
-            case StateTypes.Attack: StartCoroutine(AttackTarget()); break;
-            case StateTypes.Escape: EscapeToInitialPoint(); break;
+            switch (currentState)
+            {
+                case StateTypes.Seek: SeekTarget(); break;
+                case StateTypes.Chase: ChaseTarget(); break;
+                case StateTypes.Attack: StartCoroutine(AttackTarget()); break;
+                case StateTypes.Escape: EscapeToInitialPoint(); break;
+            }
         }
 
         WalkToTarget();
@@ -115,17 +118,13 @@ public class EnemyAI : MonoBehaviour
         if (isEscaping && Vector3.Distance(transform.position, initialPozition) > 3f) return;
         isEscaping = false;
 
-        if (isAttacking) return;
-
-        float distanceToPlayer = Vector3.Distance(Player.Instance.transform.position, transform.position);
-
         bool ifHit = Physics.Raycast(new Ray(transform.position, Player.Instance.transform.position - transform.position), out RaycastHit _hit, distanceToStartChase);
 
         if (ifHit && _hit.collider.gameObject == Player.Instance.gameObject)
         {
             if (Random.Range(0f, 100f) < fright)
                 UpdateState(StateTypes.Escape);
-            else if (distanceToPlayer < distanceToStartAttack)
+            else if (Vector3.Distance(Player.Instance.transform.position, transform.position) < distanceToStartAttack)
                 UpdateState(StateTypes.Attack);
             else
                 UpdateState(StateTypes.Chase);
