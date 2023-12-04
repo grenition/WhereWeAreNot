@@ -5,7 +5,11 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
-    [SerializeField] public float lifeTime = 5f;
+    [SerializeField] float lifeTime = 5f;
+    [SerializeField] float damage = 25f;
+    [SerializeField] float explosionRadius = 2.5f;
+
+    [SerializeField] GameObject destroyPrefab;
 
     void Start() {
         StartCoroutine(DestroyAfterLifeTime());
@@ -16,12 +20,21 @@ public class Projectile : MonoBehaviour
         Destroy(gameObject);
     }
 
-
     void OnCollisionEnter(Collision collision) {
-        if(collision.gameObject == Player.Instance.gameObject) {
-            
+        foreach (var collider in Physics.OverlapSphere(transform.position, explosionRadius))
+        {
+            if(collider.TryGetComponent(out Health health))
+            {
+                health.Damage(damage);
+            }
         }
 
         Destroy(gameObject);
+    }
+
+    void OnDestroy() {
+        if (destroyPrefab != null) {
+            Instantiate(destroyPrefab, transform.position, Quaternion.identity);
+        }
     }
 }

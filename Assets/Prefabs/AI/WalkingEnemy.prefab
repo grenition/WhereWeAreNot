@@ -44,7 +44,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 6436c14f55e8cc94592467129776e220, type: 3}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 0.421
   m_Pitch: 1
   Loop: 1
@@ -185,7 +185,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -282,7 +282,7 @@ Transform:
   m_GameObject: {fileID: 2390332365404038817}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 2}
+  m_LocalPosition: {x: 0, y: 0, z: 2.25}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -302,6 +302,8 @@ GameObject:
   - component: {fileID: 4053510712209257951}
   - component: {fileID: 8214861582682128308}
   - component: {fileID: -4632183366956185236}
+  - component: {fileID: 1615478794804990345}
+  - component: {fileID: 8702129991289078170}
   m_Layer: 0
   m_Name: WalkingEnemy
   m_TagString: Untagged
@@ -340,14 +342,14 @@ CapsuleCollider:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 512
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 1.25
-  m_Height: 2.5
+  m_Radius: 1
+  m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &1203462876521970472
@@ -358,7 +360,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2700094328338800672}
   serializedVersion: 4
-  m_Mass: 1
+  m_Mass: 25
   m_Drag: 0
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -390,19 +392,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   movementSpeed: 5
-  reflex: 2
-  fright: 30
+  reflex: 1.5
+  fright: 10
   currentState: 0
   target: {x: 0, y: 0, z: 0}
-  targetSet: 0
-  seekRadius: 5
-  distanceToStartChase: 20
+  seekPointSet: 0
+  seekRadius: 3.78
+  distanceToStartChase: 21.6
   distanceToStartAttack: 7.5
   rotationBody: {fileID: 6729145387987030958}
   shootingPoint: {fileID: 1174807367166839048}
   projectile: {fileID: 9010317917924161751, guid: 58e7b017b3436f8478305a1949540c31,
     type: 3}
-  projectileVelocity: 40
+  projectileVelocity: 30
+  shootSound: {fileID: 8300000, guid: 72ae9f484f095304f8b8ee7b77a3218d, type: 3}
 --- !u!114 &8214861582682128308
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -445,6 +448,147 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2630d48a992cb7429644612857e8d1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  destructOnCollision: 1
+  destructVelocity: 25
+  destructionEffect: {fileID: 2708598583397607911, guid: 6398d43fe79ea0140913dc5530c646af,
+    type: 3}
+  minVelocityToVisualizeCollision: 3
+  source: {fileID: 0}
+  collisionResources: {fileID: 0}
+  allowCollisionDamage: 1
+  velocityToDamage: 25
+  damagePer100kg: 100
+--- !u!114 &1615478794804990345
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2700094328338800672}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b724d67ae3b871489a136659557ee78, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentHealth: 10
+  maxHealthPoints: 10
+  OnHealthChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHealthEnded:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: -4632183366956185236}
+        m_TargetAssemblyTypeName: ThrowableObject, Assembly-CSharp
+        m_MethodName: Destruct
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnRegenerate:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!82 &8702129991289078170
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2700094328338800672}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: b5f8e27147debbc488d5e707d3fc12e7, type: 3}
+  m_PlayOnAwake: 1
+  m_Volume: 0.7
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1001 &559173318171630023
 PrefabInstance:
   m_ObjectHideFlags: 0
