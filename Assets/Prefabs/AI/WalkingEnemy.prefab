@@ -391,15 +391,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0c713648bfad0547b0330e30167c998, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movementSpeed: 5
+  movementSpeed: 7
   reflex: 1.5
   fright: 10
   currentState: 0
   target: {x: 0, y: 0, z: 0}
   seekPointSet: 0
-  seekRadius: 3.78
-  distanceToStartChase: 21.6
-  distanceToStartAttack: 7.5
+  seekRadius: 5
+  distanceToStartChase: 20
+  distanceToStartAttack: 15
   rotationBody: {fileID: 6729145387987030958}
   shootingPoint: {fileID: 1174807367166839048}
   projectile: {fileID: 9010317917924161751, guid: 58e7b017b3436f8478305a1949540c31,
