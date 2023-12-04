@@ -51,6 +51,7 @@ public class EnemyAI : MonoBehaviour
     private float pathFindingTargetTime = 0f;
     private float pathFindingInterval = 0.1f;
     private bool pathCorrect = false;
+    private bool dontEscape = false;
 
     // Start is called before the first frame update
     void Start()
@@ -114,16 +115,15 @@ public class EnemyAI : MonoBehaviour
     void ManageStates()
     {
         if (currentState != StateTypes.Seek) seekPointSet = false;
-
-        if (isEscaping && Vector3.Distance(transform.position, initialPozition) > 3f) return;
-        isEscaping = false;
+        if(isEscaping) return;
 
         bool ifHit = Physics.Raycast(new Ray(transform.position, Player.Instance.transform.position - transform.position), out RaycastHit _hit, distanceToStartChase);
 
         if (ifHit && _hit.collider.gameObject == Player.Instance.gameObject)
         {
-            if (Random.Range(0f, 100f) < fright)
-                UpdateState(StateTypes.Escape);
+            if (Random.Range(1f, 100f) < fright && !dontEscape){
+                StartCoroutine(DontEscapeDelay());
+                UpdateState(StateTypes.Escape);}
             else if (Vector3.Distance(Player.Instance.transform.position, transform.position) < distanceToStartAttack)
                 UpdateState(StateTypes.Attack);
             else
@@ -176,12 +176,14 @@ public class EnemyAI : MonoBehaviour
     {
         isEscaping = true;
         target = initialPozition;
+        if (Vector3.Distance(transform.position, initialPozition) < 1.5f) isEscaping = false;
+
     }
 
     void OnDrawGizmosSelected()
     {
         Gizmos.color = new Color(0, 255, 0);
-        Gizmos.DrawWireCube(initialPozition, new Vector3(seekRadius * 2f, 2, seekRadius * 2));
+        Gizmos.DrawWireCube(transform.position, new Vector3(seekRadius * 2f, 2, seekRadius * 2));
 
 
         Gizmos.color = new Color(0, 0, 255);
@@ -190,5 +192,11 @@ public class EnemyAI : MonoBehaviour
 
         Gizmos.color = new Color(255, 0, 0);
         Gizmos.DrawWireSphere(transform.position, distanceToStartAttack);
+    }
+
+    IEnumerator DontEscapeDelay() {
+        dontEscape = true;
+        yield return new WaitForSeconds(10f);
+        dontEscape = false;
     }
 }

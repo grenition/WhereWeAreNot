@@ -390,20 +390,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0c713648bfad0547b0330e30167c998, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movementSpeed: 7.5
-  fright: 0
-  reflex: 1.25
+  movementSpeed: 5
+  fright: 10
+  reflex: 1.5
   currentState: 0
   target: {x: 0, y: 0, z: 0}
   seekPointSet: 0
-  seekRadius: 5
-  distanceToStartChase: 20
+  seekRadius: 3.78
+  distanceToStartChase: 21.6
   distanceToStartAttack: 7.5
   rotationBody: {fileID: 6729145387987030958}
   shootingPoint: {fileID: 1174807367166839048}
   projectile: {fileID: 9010317917924161751, guid: 58e7b017b3436f8478305a1949540c31,
     type: 3}
-  projectileVelocity: 30
+  projectileVelocity: 23
 --- !u!114 &8214861582682128308
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -446,7 +446,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2630d48a992cb7429644612857e8d1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destructOnCollision: 0
+  destructOnCollision: 1
   destructVelocity: 25
   destructionEffect: {fileID: 2708598583397607911, guid: 6398d43fe79ea0140913dc5530c646af,
     type: 3}
