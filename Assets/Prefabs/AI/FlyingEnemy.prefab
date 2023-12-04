@@ -369,7 +369,7 @@ Rigidbody:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 0
@@ -450,6 +450,9 @@ MonoBehaviour:
   minVelocityToVisualizeCollision: 3
   source: {fileID: 0}
   collisionResources: {fileID: 0}
+  allowCollisionDamage: 1
+  velocityToDamage: 20
+  damagePer100kg: 50
 --- !u!1001 &559173318171630023
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -371,7 +371,7 @@ Rigidbody:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 0
@@ -391,8 +391,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0c713648bfad0547b0330e30167c998, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movementSpeed: 5
-  reflex: 1.5
+  movementSpeed: 10
+  reflex: 0.5
   fright: 10
   currentState: 0
   target: {x: 0, y: 0, z: 0}
