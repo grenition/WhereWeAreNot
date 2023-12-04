@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class RoomEnemyEncounter : EntityTrigger
 {
@@ -12,6 +13,9 @@ public class RoomEnemyEncounter : EntityTrigger
     private int previousWavesEnemyCount = 0;
 
     private int currentWaveIndex = 0;
+
+    public UnityEvent onEncounterStart;
+    public UnityEvent onEncounterEnd;
 
 
     void FixedUpdate()
@@ -30,12 +34,17 @@ public class RoomEnemyEncounter : EntityTrigger
                 }
             }
         }
-        if(currentWaveIndex + 1 >= enemiesPerWave.Length) Destroy(gameObject);
+        if (currentWaveIndex + 1 >= enemiesPerWave.Length)
+        {
+            onEncounterEnd.Invoke();
+            Destroy(gameObject);
+        }
     }
 
     protected override void OnPlayerEnter(Player _player)
     {
         if (beenEnabled) return;
+        onEncounterStart.Invoke();
         for (int i = 0; i < enemiesPerWave[0]; i += 1)
         {
             int spawnPointNum = Random.Range(0, spawnPoints.Length);
@@ -45,13 +54,11 @@ public class RoomEnemyEncounter : EntityTrigger
 
         beenEnabled = true;
 
-        print("я жив");
     }
 
     void OnEnemyDeath()
     {
         killedEnemiesCounter += 1;
         print("убито" + killedEnemiesCounter);
-
     }
 }

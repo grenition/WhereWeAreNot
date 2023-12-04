@@ -17,10 +17,10 @@ public class EnemyAI : MonoBehaviour
     [Header("Параметры ИИ")]
     [Tooltip("Cкорость передвижения")]
     [SerializeField] float movementSpeed = 5f;
-    [Tooltip("Вероятность испугаться игрока")]
-    [SerializeField][Range(0f, 100f)] float fright = 30f;
     [Tooltip("Задержка перед совершением действия (сек)")]
     [SerializeField] float reflex = 2f;
+    [Tooltip("Вероятность испугаться игрока")]
+    [SerializeField][Range(0f, 100f)] float fright = 30f;
 
     [Header("Навигационное состояние")]
     [SerializeField] private StateTypes currentState = StateTypes.Seek;
@@ -41,6 +41,7 @@ public class EnemyAI : MonoBehaviour
     [SerializeField] GameObject projectile;
     [Tooltip("Скорость полёта снаряда")]
     [SerializeField] float projectileVelocity = 15f;
+    [SerializeField] AudioClip shootSound;
 
     private Vector3 initialPozition;
     private bool isAttacking;
@@ -48,6 +49,7 @@ public class EnemyAI : MonoBehaviour
 
     private Walker walker;
     private NavMeshPath path;
+    private AudioSource audioSource;
     private float pathFindingTargetTime = 0f;
     private float pathFindingInterval = 0.1f;
     private bool pathCorrect = false;
@@ -58,6 +60,7 @@ public class EnemyAI : MonoBehaviour
     {
         walker = GetComponent<Walker>();
         path = new NavMeshPath();
+        audioSource = GetComponent<AudioSource>();
         initialPozition = transform.position;
     }
 
@@ -115,15 +118,17 @@ public class EnemyAI : MonoBehaviour
     void ManageStates()
     {
         if (currentState != StateTypes.Seek) seekPointSet = false;
-        if(isEscaping) return;
+        if (isEscaping) return;
 
         bool ifHit = Physics.Raycast(new Ray(transform.position, Player.Instance.transform.position - transform.position), out RaycastHit _hit, distanceToStartChase);
 
         if (ifHit && _hit.collider.gameObject == Player.Instance.gameObject)
         {
-            if (Random.Range(1f, 100f) < fright && !dontEscape){
+            if (Random.Range(1f, 100f) < fright && !dontEscape)
+            {
                 StartCoroutine(DontEscapeDelay());
-                UpdateState(StateTypes.Escape);}
+                UpdateState(StateTypes.Escape);
+            }
             else if (Vector3.Distance(Player.Instance.transform.position, transform.position) < distanceToStartAttack)
                 UpdateState(StateTypes.Attack);
             else
@@ -166,9 +171,16 @@ public class EnemyAI : MonoBehaviour
 
         // Выстрелить в игрока с задержкой Reflex
 
+
         yield return new WaitForSeconds(reflex);
         GameObject prj = Instantiate(projectile, shootingPoint.position, shootingPoint.rotation);
         prj.GetComponent<Rigidbody>().velocity = (Player.Instance.transform.position - transform.position).normalized * projectileVelocity;
+
+        if (shootSound != null)
+        {
+            audioSource.PlayOneShot(shootSound);
+        }
+
         isAttacking = false;
     }
 
@@ -178,6 +190,14 @@ public class EnemyAI : MonoBehaviour
         target = initialPozition;
         if (Vector3.Distance(transform.position, initialPozition) < 1.5f) isEscaping = false;
 
+    }
+
+
+    IEnumerator DontEscapeDelay()
+    {
+        dontEscape = true;
+        yield return new WaitForSeconds(10f);
+        dontEscape = false;
     }
 
     void OnDrawGizmosSelected()
@@ -194,9 +214,5 @@ public class EnemyAI : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, distanceToStartAttack);
     }
 
-    IEnumerator DontEscapeDelay() {
-        dontEscape = true;
-        yield return new WaitForSeconds(10f);
-        dontEscape = false;
-    }
+
 }
