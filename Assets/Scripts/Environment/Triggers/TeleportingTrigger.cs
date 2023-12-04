@@ -17,7 +17,6 @@ public class TeleportingTrigger : EntityTrigger
     }
     private void TeleportToPoint(Entity _entity, Transform _point)
     {
-        _entity.transform.position = _point.position;
-        _entity.CurrentWalker.SetTargetRotation(_point.up);
+        _entity.CurrentWalker.Teleport(_point.position, _point.rotation);
     }
 }

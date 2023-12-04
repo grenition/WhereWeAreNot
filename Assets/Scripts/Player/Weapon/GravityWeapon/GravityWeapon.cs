@@ -121,6 +121,9 @@ public class GravityWeapon : Weapon
     }
     void Update()
     {
+        if (Player.Instance.Paused)
+            return;
+
         if (Input.GetKeyDown(changeModeKey))
             ChangeGravityMode();
         else if (Input.GetKeyDown(startPointsAttractionKey))

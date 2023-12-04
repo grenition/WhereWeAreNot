@@ -6,9 +6,6 @@ using UnityEngine.Events;
 public class EntityTrigger : MonoBehaviour
 {
     public bool TriggerEnabled { get => triggerEnabled; set { triggerEnabled = value; } }
-
-    public UnityAction OnPlayerTriggerEnter;
-    public UnityAction OnPlayerTriggerExit;
     public List<Entity> EntitiesInTrigger { get => entities; }
     private List<Entity> entities = new List<Entity>();
 
@@ -27,7 +24,6 @@ public class EntityTrigger : MonoBehaviour
             OnEntityEnter(_entity);
             if (_entity is Player)
             {
-                OnPlayerTriggerEnter?.Invoke();
                 OnPlayerEnter(_entity as Player);
             }
         }
@@ -57,7 +53,6 @@ public class EntityTrigger : MonoBehaviour
 
             if (_entity is Player)
             {
-                OnPlayerTriggerExit?.Invoke();
                 OnPlayerExit(_entity as Player);
             }
         }
