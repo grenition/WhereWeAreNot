@@ -13,9 +13,14 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] private GameObject pausePanel;
     [SerializeField] private GameObject[] disablingObjectOnPauseActivation;
     [SerializeField] private GameObject diePanel;
+    [SerializeField] private CanvasGroup interactionPanelGroup;
+    [SerializeField] private TMP_Text interactionPanelText;
     [SerializeField] private float diePostProccesingTransitionTime = 0.1f;
+    [SerializeField] private float interactionGroupInterpolationMultiplier = 5f;
 
     private PostProccesingType savedPPType;
+    private float interactionGroupTargetAlpha = 0f;
+
 
     private void Awake()
     {
@@ -27,17 +32,21 @@ public class PlayerUI : MonoBehaviour
     {     
         SetPauseMenuActive(Player.Instance.Paused);
         SetDieMenuActive(Player.Instance.Dead);
+
+        interactionPanelGroup.alpha = 0f;
+        DisableInteractionPanel();
     }
 
     private void Update()
     {
         UpdateBulletTimeBar();
+        UpdateInteractions();
     }
     private void UpdateBulletTimeBar()
     {
-        if (bulletTimeBar == null || Player.Instance.BulletTime == null)
+        if (bulletTimeBar == null || PlayerBulletTime.Instance == null)
             return;
-        bulletTimeBar.fillAmount = Player.Instance.BulletTime.TimePoints;
+        bulletTimeBar.fillAmount = PlayerBulletTime.Instance.TimePoints;
     }
 
     public void Unpause()
@@ -78,5 +87,23 @@ public class PlayerUI : MonoBehaviour
     public void Respawn()
     {
         RespawnController.Respawn();
+    }
+
+    public void EnableInteractionPanel(string interactionText)
+    {
+        if (interactionPanelText != null)
+            interactionPanelText.text = interactionText;
+        interactionGroupTargetAlpha = 1f;
+    }
+    public void DisableInteractionPanel()
+    {
+        interactionGroupTargetAlpha = 0f;
+    }
+    private void UpdateInteractions()
+    {
+        if (interactionPanelGroup == null)
+            return;
+
+        interactionPanelGroup.alpha = Mathf.Lerp(interactionPanelGroup.alpha, interactionGroupTargetAlpha, Time.unscaledDeltaTime * interactionGroupInterpolationMultiplier);
     }
 }

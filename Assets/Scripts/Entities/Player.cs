@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [DisallowMultipleComponent]
-[RequireComponent(typeof(PlayerMovement), typeof(PlayerBulletTime), typeof(PlayerHealth))]
+[RequireComponent(typeof(PlayerMovement))]
 public class Player : Entity
 {
     public static Player Instance { get; private set; }
     public PlayerMovement Movement { get => movement; }
-    public PlayerBulletTime BulletTime { get => bulletTime; }
-    public PlayerHealth Health { get => health; }
-    public PlayerUI UI { get => playerUI; }
+
     public bool Paused
     {
         get => paused;
@@ -23,8 +21,8 @@ public class Player : Entity
 
             if (paused)
             {
-                if (bulletTime != null)
-                    bulletTime.enabled = false;
+                if (PlayerBulletTime.Instance != null)
+                    PlayerBulletTime.Instance.enabled = false;
                 Time.timeScale = 0f;
                 CameraLooking.Instance.ShowCursor = true;
                 CameraLooking.Instance.LockRotation = true;
@@ -32,16 +30,17 @@ public class Player : Entity
             else
             {
                 Time.timeScale = 1f;
-                if (bulletTime != null)
-                    bulletTime.enabled = true;
+                if (PlayerBulletTime.Instance != null)
+                    PlayerBulletTime.Instance.enabled = true;
                 CameraLooking.Instance.ShowCursor = false;
                 CameraLooking.Instance.LockRotation = false;
             }
 
-            if (playerUI == null)
-                return;
-            playerUI.SetPauseMenuActive(paused && !dead);
-            playerUI.SetDieMenuActive(dead);
+            if (PlayerUI.Instance != null)
+            {
+                PlayerUI.Instance.SetPauseMenuActive(paused && !dead);
+                PlayerUI.Instance.SetDieMenuActive(dead);
+            }
         }
     }
     public bool Dead
@@ -54,20 +53,19 @@ public class Player : Entity
 
             dead = value;
             Paused = dead;
-            health.Regeneration = !dead;
+            if (PlayerHealth.Instance != null)
+                PlayerHealth.Instance.Regeneration = !dead;
         }
     }
 
-    private PlayerMovement movement;
-    private PlayerBulletTime bulletTime;
-    private PlayerHealth health;
-    [SerializeField] private PlayerUI playerUI;
-
+    [SerializeField] private PlayerMovement movement;
+    [SerializeField] private GravityWeapon gravityWeapon;
     [SerializeField] private bool paused = false;
     [SerializeField] private bool dead = false;
     protected override void Awake()
     {
         base.Awake();
+        movement = GetComponent<PlayerMovement>();
 
         if (Instance == null)
             Instance = this;
@@ -76,17 +74,14 @@ public class Player : Entity
             Destroy(gameObject);
             return;
         }
-        movement = GetComponent<PlayerMovement>();
-        bulletTime = GetComponent<PlayerBulletTime>();
-        health = GetComponent<PlayerHealth>();
 
-
-        health.OnHealthEnded.AddListener(Die);
     }
     private void Start()
     {
+        if(PlayerHealth.Instance != null)
+            PlayerHealth.Instance.OnHealthEnded.AddListener(Die);
         Paused = true;
-        Paused = false;   
+        Paused = false;
     }
     private void Update()
     {
@@ -98,5 +93,16 @@ public class Player : Entity
     private void Die()
     {
         Dead = true;
+    }
+    
+    public void HideGravityWeapon()
+    {
+        if(gravityWeapon != null)
+        gravityWeapon.gameObject.SetActive(false);
+    }
+    public void ShowGravityWeapon()
+    {
+        if(gravityWeapon != null)
+            gravityWeapon.gameObject.SetActive(true);
     }
 }

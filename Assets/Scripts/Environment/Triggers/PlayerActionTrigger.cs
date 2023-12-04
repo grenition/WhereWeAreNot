@@ -5,12 +5,16 @@ using UnityEngine.Events;
 
 public class PlayerActionTrigger : EntityTrigger
 {
+    [SerializeField] private float holdTime = 10f;
+
     public UnityEvent OnPlayerTriggerEnter;
     public UnityEvent OnPlayerTriggerStay;
     public UnityEvent OnPlayerTriggerExit;
+    public UnityEvent OnHoldTriggerEnter;
     protected override void OnPlayerEnter(Player _player)
     {
         OnPlayerTriggerEnter?.Invoke();
+        Invoke("InvokeHoldTriggerEnter", holdTime);
     }
     protected override void OnEntityStay(Entity _entity)
     {
@@ -19,5 +23,10 @@ public class PlayerActionTrigger : EntityTrigger
     protected override void OnPlayerExit(Player _player)
     {
         OnPlayerTriggerExit?.Invoke();
+    }
+
+    private void InvokeHoldTriggerEnter()
+    {
+        OnHoldTriggerEnter?.Invoke();
     }
 }

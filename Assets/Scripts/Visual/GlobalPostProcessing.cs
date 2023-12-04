@@ -7,7 +7,8 @@ public enum PostProccesingType
 {
     standart,
     bulletTime,
-    die
+    die,
+    blackScreen
 }
 
 [RequireComponent(typeof(Volume))]
@@ -20,6 +21,7 @@ public class GlobalPostProcessing : MonoBehaviour
     [SerializeField] private VolumeProfile defaultProfile;
     [SerializeField] private VolumeProfile bulletTimeProfile;
     [SerializeField] private VolumeProfile dieProfile;
+    [SerializeField] private VolumeProfile blackProfile;
     [SerializeField] private float transitionTime = 0.3f;
 
     [Header("Health Volume")]
@@ -80,7 +82,10 @@ public class GlobalPostProcessing : MonoBehaviour
                 Instance.SetNewProfile(Instance.bulletTimeProfile, Instance.transitionTime);
                 break;
             case PostProccesingType.die:
-                Instance.SetNewProfile(Instance.dieProfile, Instance.transitionTime); 
+                Instance.SetNewProfile(Instance.dieProfile, Instance.transitionTime);
+                break;
+            case PostProccesingType.blackScreen:
+                Instance.SetNewProfile(Instance.blackProfile, Instance.transitionTime);
                 break;
         }
     }
@@ -99,6 +104,9 @@ public class GlobalPostProcessing : MonoBehaviour
                 break;
             case PostProccesingType.die:
                 Instance.SetNewProfile(Instance.dieProfile, transitionTime);
+                break;
+            case PostProccesingType.blackScreen:
+                Instance.SetNewProfile(Instance.blackProfile, transitionTime);
                 break;
         }
     }

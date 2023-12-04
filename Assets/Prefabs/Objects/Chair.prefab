@@ -129,7 +129,7 @@ MonoBehaviour:
   destructOnCollision: 0
   destructVelocity: 10
   destructionEffect: {fileID: 0}
-  minVelocityToVisualizeCollision: 5
+  minVelocityToVisualizeCollision: 3
   source: {fileID: 779518184517333869}
   collisionResources: {fileID: 11400000, guid: ed6ed8b04a0f258469fa78c5a2a57764, type: 2}
   allowCollisionDamage: 0

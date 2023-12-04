@@ -3,6 +3,7 @@ using UnityEngine;
 [RequireComponent(typeof(Player))]
 public class PlayerBulletTime : MonoBehaviour
 {
+    public static PlayerBulletTime Instance;
     public float TimePoints { get => timePoints; }
 
     [Header("Main preferences")]
@@ -29,7 +30,10 @@ public class PlayerBulletTime : MonoBehaviour
     private float currentTargetTime = 0f;
     private void Awake()
     {
+        if (Instance == null)
+            Instance = this;
         player = GetComponent<Player>();
+        
     }
 
     private void Update()
