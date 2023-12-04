@@ -459,6 +459,27 @@ public class Walker : MonoBehaviour
     {
         ignoreFlippingTime = Time.time + time;
     }
+    public void ResetAll()
+    {
+        ResetTargetRotation();
+        extraMovementVelocity = Vector3.zero;
+        physicsMomentum = Vector3.zero;
+        groundAdjustmentVelocity = Vector3.zero;
+        onGroundMovementVelocity = Vector3.zero;
+        airMovementVelocity = Vector3.zero;
+        rb.velocity = Vector3.zero;
+    }
+    public void Teleport(Vector3 position)
+    {
+        rb.MovePosition(position);
+        ResetAll();
+    }
+    public void Teleport(Vector3 position, Quaternion rotation)
+    {
+        rb.MovePosition(position);
+        rb.MoveRotation(rotation);
+        ResetAll();
+    }
     #endregion
 
     #region Events

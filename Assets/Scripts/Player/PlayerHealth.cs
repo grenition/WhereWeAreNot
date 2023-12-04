@@ -6,8 +6,10 @@ using UnityEngine;
 public class PlayerHealth : Health
 {
     public static PlayerHealth Instance { get; private set; }
+    public bool Regeneration { get => regeneration; set { regeneration = value; } }
 
     [SerializeField] private float regeneratingHealthsPerSecond = 10f;
+    [SerializeField] private bool regeneration = true;
 
     private void Awake()
     {
@@ -16,7 +18,9 @@ public class PlayerHealth : Health
     }
     private void Update()
     {
-        HealthPoints += regeneratingHealthsPerSecond * Time.deltaTime;
         GlobalPostProcessing.SetHealthVolumeWeight(1 - HealthPointsProportion);
+
+        if (regeneration)
+            HealthPoints += regeneratingHealthsPerSecond * Time.deltaTime;
     }
 }

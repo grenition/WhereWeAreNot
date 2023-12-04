@@ -31,7 +31,7 @@ public class WeaponCameraRotationDelay : MonoBehaviour
         float _distance = Vector3.Distance(rotation, Vector3.zero);
         if(_distance > 0.1f)
         {
-            rotation = Vector3.MoveTowards(rotation, Vector3.zero, returningSpeed * Time.deltaTime * _distance);
+            rotation = Vector3.MoveTowards(rotation, Vector3.zero, returningSpeed * Time.unscaledDeltaTime * _distance);
         }
         rotation = ClampEulers(rotation);
 
