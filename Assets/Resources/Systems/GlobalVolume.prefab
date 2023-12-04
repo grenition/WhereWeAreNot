@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5031965150852861286}
   - component: {fileID: 2881502752273585153}
   m_Layer: 0
-  m_Name: Global Volume
+  m_Name: GlobalVolume
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -65,6 +65,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   defaultProfile: {fileID: 11400000, guid: 0d7c76fc5608c504a8a8cf54022d49e7, type: 2}
   bulletTimeProfile: {fileID: 11400000, guid: f0d116c4f04a34e408fc46c66d5455af, type: 2}
+  dieProfile: {fileID: 11400000, guid: 14f5cc055a6280747a8449be6ddce15c, type: 2}
   transitionTime: 0.3
   healthVolume: {fileID: 2881502752273585153}
 --- !u!114 &2881502752273585153
@@ -82,5 +83,5 @@ MonoBehaviour:
   m_IsGlobal: 1
   priority: 1
   blendDistance: 0
-  weight: 1
+  weight: 0
   sharedProfile: {fileID: 11400000, guid: 46850309708d2e44eac857b899ebc597, type: 2}

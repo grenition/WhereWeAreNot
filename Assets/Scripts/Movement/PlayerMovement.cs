@@ -470,11 +470,13 @@ public class PlayerMovement : MonoBehaviour
     public void Teleport(Vector3 _position)
     {
         walker.mainRigidbody.MovePosition(_position);
+        walker.ResetAll();
     }
     public void Teleport(Vector3 _position, Quaternion _rotation)
     {
         walker.mainRigidbody.MovePosition(_position);
         walker.mainRigidbody.MoveRotation(_rotation);
+        walker.ResetAll();
     }
     #endregion
 }

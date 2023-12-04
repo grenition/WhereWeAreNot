@@ -6,17 +6,20 @@ using UnityEngine.Rendering;
 public enum PostProccesingType
 {
     standart,
-    bulletTime
+    bulletTime,
+    die
 }
 
 [RequireComponent(typeof(Volume))]
 public class GlobalPostProcessing : MonoBehaviour
 {
     public static GlobalPostProcessing Instance { get; private set; }
+    public PostProccesingType CurrentPPType { get; private set; }
 
     [Header("Base Volume")]
     [SerializeField] private VolumeProfile defaultProfile;
     [SerializeField] private VolumeProfile bulletTimeProfile;
+    [SerializeField] private VolumeProfile dieProfile;
     [SerializeField] private float transitionTime = 0.3f;
 
     [Header("Health Volume")]
@@ -67,6 +70,7 @@ public class GlobalPostProcessing : MonoBehaviour
     {
         if (Instance == null)
             return;
+        Instance.CurrentPPType = postProccesingType;
         switch (postProccesingType)
         {
             case PostProccesingType.standart:
@@ -74,6 +78,27 @@ public class GlobalPostProcessing : MonoBehaviour
                 break;
             case PostProccesingType.bulletTime:
                 Instance.SetNewProfile(Instance.bulletTimeProfile, Instance.transitionTime);
+                break;
+            case PostProccesingType.die:
+                Instance.SetNewProfile(Instance.dieProfile, Instance.transitionTime); 
+                break;
+        }
+    }
+    public static void SetProfile(PostProccesingType postProccesingType, float transitionTime)
+    {
+        if (Instance == null)
+            return;
+        Instance.CurrentPPType = postProccesingType;
+        switch (postProccesingType)
+        {
+            case PostProccesingType.standart:
+                Instance.SetNewProfile(Instance.defaultProfile, transitionTime);
+                break;
+            case PostProccesingType.bulletTime:
+                Instance.SetNewProfile(Instance.bulletTimeProfile, transitionTime);
+                break;
+            case PostProccesingType.die:
+                Instance.SetNewProfile(Instance.dieProfile, transitionTime);
                 break;
         }
     }

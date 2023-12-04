@@ -31,9 +31,9 @@ public class Health : MonoBehaviour
     [SerializeField] private float maxHealthPoints = 100f;
 
 
-    public UnityAction OnHealthChanged;
-    public UnityAction OnHealthEnded;
-    public UnityAction OnRegenerate;
+    public UnityEvent OnHealthChanged;
+    public UnityEvent OnHealthEnded;
+    public UnityEvent OnRegenerate;
 
     public void Regenerate()
     {
