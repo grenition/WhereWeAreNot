@@ -10,6 +10,7 @@ public class Player : Entity
     public PlayerMovement Movement { get => movement; }
     public PlayerBulletTime BulletTime { get => bulletTime; }
     public PlayerHealth Health { get => health; }
+    public PlayerUI UI { get => playerUI; }
     public bool Paused
     {
         get => paused;
@@ -37,8 +38,10 @@ public class Player : Entity
                 CameraLooking.Instance.LockRotation = false;
             }
 
-            PlayerUI.Instance.SetPauseMenuActive(paused && !dead);
-            PlayerUI.Instance.SetDieMenuActive(dead);
+            if (playerUI == null)
+                return;
+            playerUI.SetPauseMenuActive(paused && !dead);
+            playerUI.SetDieMenuActive(dead);
         }
     }
     public bool Dead
@@ -58,6 +61,8 @@ public class Player : Entity
     private PlayerMovement movement;
     private PlayerBulletTime bulletTime;
     private PlayerHealth health;
+    [SerializeField] private PlayerUI playerUI;
+
     [SerializeField] private bool paused = false;
     [SerializeField] private bool dead = false;
     protected override void Awake()
@@ -77,9 +82,11 @@ public class Player : Entity
 
 
         health.OnHealthEnded.AddListener(Die);
-
+    }
+    private void Start()
+    {
         Paused = true;
-        Paused = false;
+        Paused = false;   
     }
     private void Update()
     {
